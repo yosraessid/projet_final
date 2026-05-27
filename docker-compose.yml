@@ -1,9 +1,13 @@
 services:
   frontend:
+    # Nom fixe du conteneur pour le retrouver facilement.
     container_name: projet_final_frontend
     build:
+      # Construit l'image a partir du Dockerfile de production.
       context: .
       dockerfile: Dockerfile
     ports:
+      # Port machine:port conteneur => http://localhost:8080
       - "8080:80"
+    # Redemarre automatiquement sauf si tu l'arretes manuellement.
     restart: unless-stopped

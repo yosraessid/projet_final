@@ -1,12 +1,16 @@
+# Image legere Node.js pour le developpement.
 FROM node:20-alpine
 
 WORKDIR /app
 
+# Installe les dependances du projet.
 COPY package*.json ./
 RUN npm ci
 
+# Copie le code source dans le conteneur.
 COPY . .
 
 EXPOSE 5173
 
+# Lance Vite en ecoute reseau pour acces depuis le navigateur.
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]
