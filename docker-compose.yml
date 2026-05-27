@@ -1,0 +1,9 @@
+services:
+  frontend:
+    container_name: projet_final_frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    restart: unless-stopped
