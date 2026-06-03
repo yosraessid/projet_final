@@ -4,22 +4,25 @@ import { useNotifications } from '../context/NotificationsContext'
 
 function DashboardPage() {
   const { notify } = useNotifications()
-  const { projects, tasks, setTasks, members } = useAppData()
+  const { projects, tasks, members, addTask, updateTask, deleteTask, setTaskStatus } = useAppData()
   const [form, setForm] = useState({
     title: '',
     description: '',
     priority: 'Moyenne',
     deadline: '',
-    assigneeId: members[0]?.id || 1,
+    assigneeId: members[0]?.id || '',
   })
+  // Contient l id de la tache en cours de modification (null = mode ajout).
   const [editingId, setEditingId] = useState(null)
 
+  // Colonnes du mini tableau kanban.
   const columns = [
     { key: 'A faire', title: 'A faire', statusClass: 'status-todo' },
     { key: 'En cours', title: 'En cours', statusClass: 'status-progress' },
     { key: 'Terminee', title: 'Termine', statusClass: 'status-done' },
   ]
 
+  // Associe un statut a une classe CSS pour la couleur d affichage.
   const statusClass = (status) => {
     if (status === 'Terminee') return 'status-done'
     if (status === 'En cours') return 'status-progress'
@@ -34,57 +37,89 @@ function DashboardPage() {
 
   const recentTasks = useMemo(() => tasks.slice(0, 6), [tasks])
 
+  // Met a jour un champ du formulaire sans ecraser les autres champs.
   const handleFormChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }))
   }
 
+  // Remet le formulaire a son etat initial.
   const resetForm = () => {
     setForm({
       title: '',
       description: '',
       priority: 'Moyenne',
       deadline: '',
-      assigneeId: members[0]?.id || 1,
+      assigneeId: members[0]?.id || '',
     })
     setEditingId(null)
   }
 
-  const handleSaveTask = (event) => {
+  // Ajoute une nouvelle tache ou met a jour une tache existante.
+  const handleSaveTask = async (event) => {
+    // Evite le rechargement de la page lors du submit.
     event.preventDefault()
+    // Nettoie le titre pour eviter les espaces inutiles.
     const cleanTitle = form.title.trim()
+    // Le titre est obligatoire.
     if (!cleanTitle) {
       notify('Erreur', 'Merci de saisir un titre de tache.', 'warning')
       return
     }
 
+    // Objet commun utilise pour creation ou modification.
     const payload = {
       title: cleanTitle,
       description: form.description.trim() || 'Sans description',
       priority: form.priority,
       deadline: form.deadline || '—',
       status: 'A faire',
-      assigneeId: Number(form.assigneeId),
+      assigneeId: String(form.assigneeId || members[0]?.id || ''),
       projectId: projects[0]?.id || 102,
     }
 
+    const projectId = payload.projectId
+    const preparedPayload = { ...payload }
+
     if (editingId) {
-      setTasks((prev) =>
-        prev.map((task) => (task.id === editingId ? { ...task, ...payload } : task)),
-      )
-      notify('Tache', 'Tache modifiee avec succes.', 'success')
+      try {
+        await updateTask({
+          projectId,
+          taskId: editingId,
+          updates: preparedPayload,
+        })
+        notify('Tache', 'Tache modifiee avec succes.', 'success')
+      } catch (err) {
+        notify('Erreur', err?.message || 'Echec modification tache.', 'warning')
+        return
+      }
     } else {
-      setTasks((prev) => [{ id: Date.now(), ...payload }, ...prev])
-      notify('Tache', `Nouvelle tache ajoutee: "${cleanTitle}"`, 'success')
+      // Sinon: mode creation.
+      try {
+        await addTask({
+          projectId,
+          task: { id: Date.now(), ...preparedPayload },
+        })
+        notify('Tache', `Nouvelle tache ajoutee: "${cleanTitle}"`, 'success')
+      } catch (err) {
+        notify('Erreur', err?.message || 'Echec creation tache.', 'warning')
+        return
+      }
     }
     resetForm()
   }
 
-  const handleDeleteTask = (taskId) => {
-    setTasks((prev) => prev.filter((task) => task.id !== taskId))
-    notify('Tache', 'Tache supprimee.', 'warning')
-    if (editingId === taskId) resetForm()
+  // Supprime une tache.
+  const handleDeleteTask = async (task) => {
+    try {
+      await deleteTask({ projectId: task.projectId, taskId: task.id })
+      notify('Tache', 'Tache supprimee.', 'warning')
+      if (editingId === task.id) resetForm()
+    } catch (err) {
+      notify('Erreur', err?.message || 'Echec suppression tache.', 'warning')
+    }
   }
 
+  // Charge une tache dans le formulaire pour edition.
   const handleEditTask = (task) => {
     setEditingId(task.id)
     setForm({
@@ -96,14 +131,18 @@ function DashboardPage() {
     })
   }
 
-  const handleStatusChange = (taskId, nextStatus) => {
-    setTasks((prev) =>
-      prev.map((task) => (task.id === taskId ? { ...task, status: nextStatus } : task)),
-    )
-    notify('Statut', `Statut mis a jour: ${nextStatus}`, 'info')
+  // Change uniquement le statut d une tache.
+  const handleStatusChange = async (task, nextStatus) => {
+    try {
+      await setTaskStatus({ projectId: task.projectId, taskId: task.id, status: nextStatus })
+      notify('Statut', `Statut mis a jour: ${nextStatus}`, 'info')
+    } catch (err) {
+      notify('Erreur', err?.message || 'Echec changement statut.', 'warning')
+    }
   }
 
   return (
+    // Ecran principal du dashboard.
     <section className="stack">
       <div className="widget-grid">
         <article className="card">
@@ -137,13 +176,14 @@ function DashboardPage() {
               <h3>{members.length}</h3>
             </article>
             <article className="card stat-card">
-              <p>Progression</p>
+              <p>Avancement</p>
               <h3>{completion}%</h3>
             </article>
           </div>
         </article>
       </div>
 
+      {/* Bloc: vue kanban par statut. */}
       <div className="kanban-grid">
         {columns.map((column) => (
           <article key={column.key} className={`kanban-column ${column.statusClass}`}>
@@ -160,6 +200,7 @@ function DashboardPage() {
         ))}
       </div>
 
+      {/* Bloc: formulaire d ajout/modification de tache. */}
       <article className="card">
         <h2>{editingId ? 'Modifier la tache' : 'Ajouter une tache'}</h2>
         <form className="form form-grid" onSubmit={handleSaveTask}>
@@ -226,6 +267,7 @@ function DashboardPage() {
         </form>
       </article>
 
+      {/* Bloc: tableau detaille des taches recentes. */}
       <article className="card">
         <h2>Taches recentes</h2>
         <div className="table-wrap">
@@ -253,7 +295,7 @@ function DashboardPage() {
                       <select
                         className={`status-select ${statusClass(t.status)}`}
                         value={t.status}
-                        onChange={(e) => handleStatusChange(t.id, e.target.value)}
+                        onChange={(e) => handleStatusChange(t, e.target.value)}
                       >
                         <option>A faire</option>
                         <option>En cours</option>
@@ -275,7 +317,7 @@ function DashboardPage() {
                         <button
                           type="button"
                           className="button button-danger"
-                          onClick={() => handleDeleteTask(t.id)}
+                          onClick={() => handleDeleteTask(t)}
                         >
                           Supprimer
                         </button>
@@ -289,11 +331,22 @@ function DashboardPage() {
         </div>
       </article>
 
+      {/* Bloc: progression visuelle + actions rapides. */}
       <div className="widget-grid">
         <article className="card">
           <h2>Progression</h2>
-          <div className="progress-ring">
-            <span>{completion}%</span>
+          <div
+            className="progress-ring"
+            style={{ '--progress': completion }}
+            role="progressbar"
+            aria-valuenow={completion}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Progression des taches"
+          >
+            <div className="progress-ring-inner">
+              <span>{completion}%</span>
+            </div>
           </div>
         </article>
         <article className="card">

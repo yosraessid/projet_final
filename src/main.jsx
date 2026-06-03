@@ -7,21 +7,35 @@ import { NotificationsProvider } from './context/NotificationsContext.jsx'
 import { AppDataProvider } from './context/AppDataContext.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { ThemeProvider, initTheme } from './context/ThemeContext.jsx'
+import FirebaseSetupScreen from './components/FirebaseSetupScreen.jsx'
+import { isFirebaseConfigured } from './firebase/firebaseClient'
 
 initTheme()
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <BrowserRouter>
+const root = createRoot(document.getElementById('root'))
+
+if (!isFirebaseConfigured()) {
+  root.render(
+    <StrictMode>
       <ThemeProvider>
-        <AuthProvider>
-          <NotificationsProvider>
-            <AppDataProvider>
-              <App />
-            </AppDataProvider>
-          </NotificationsProvider>
-        </AuthProvider>
+        <FirebaseSetupScreen />
       </ThemeProvider>
-    </BrowserRouter>
-  </StrictMode>,
-)
+    </StrictMode>,
+  )
+} else {
+  root.render(
+    <StrictMode>
+      <BrowserRouter>
+        <ThemeProvider>
+          <AuthProvider>
+            <NotificationsProvider>
+              <AppDataProvider>
+                <App />
+              </AppDataProvider>
+            </NotificationsProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </BrowserRouter>
+    </StrictMode>,
+  )
+}

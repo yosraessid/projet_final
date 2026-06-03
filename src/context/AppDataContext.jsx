@@ -1,70 +1,139 @@
-import { createContext, useContext, useMemo, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react'
+import { useAuth } from './AuthContext'
+import { isFirebaseConfigured } from '../firebase/firebaseClient'
+import {
+  createProjectFromEmails,
+  createTaskInProject,
+  deleteTaskInProject,
+  ensureDefaultProjectForUser,
+  subscribeToAppData,
+  updateTaskInProject,
+} from '../services/firebaseAppDataService'
 
 const AppDataContext = createContext(null)
 
-const initialMembers = [
-  { id: 1, name: 'Yosra', email: 'yosra@email.com', role: 'Admin' },
-  { id: 2, name: 'Rayen', email: 'rayen@email.com', role: 'Membre' },
-  { id: 3, name: 'Sarra', email: 'sarra@email.com', role: 'Membre' },
-]
-
-const initialProjects = [
-  {
-    id: 102,
-    name: 'To-do collaborative',
-    description: 'Liste principale de l equipe',
-    members: [1, 2, 3],
-  },
-]
-
-const initialTasks = [
-  {
-    id: 1001,
-    projectId: 102,
-    title: 'Faire la page accueil',
-    description: 'Ecrire une presentation simple',
-    status: 'A faire',
-    priority: 'Haute',
-    deadline: '2026-06-02',
-    assigneeId: 1,
-  },
-  {
-    id: 1002,
-    projectId: 102,
-    title: 'Creer la structure des pages',
-    description: 'Routes + layout + sidebar',
-    status: 'En cours',
-    priority: 'Moyenne',
-    deadline: '2026-06-05',
-    assigneeId: 2,
-  },
-  {
-    id: 1003,
-    projectId: 102,
-    title: 'Faire le design moderne',
-    description: 'Theme dark + cards',
-    status: 'Terminee',
-    priority: 'Basse',
-    deadline: '2026-06-01',
-    assigneeId: 3,
-  },
-]
-
 export function AppDataProvider({ children }) {
-  const [members, setMembers] = useState(initialMembers)
-  const [projects, setProjects] = useState(initialProjects)
-  const [tasks, setTasks] = useState(initialTasks)
+  const { user } = useAuth()
+
+  const [members, setMembers] = useState([])
+  const [projects, setProjects] = useState([])
+  const [tasks, setTasks] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+
+  // Temps reel: ecoute Firestore et met a jour l interface automatiquement.
+  useEffect(() => {
+    if (!isFirebaseConfigured() || !user?.uid) {
+      setMembers([])
+      setProjects([])
+      setTasks([])
+      setError(null)
+      return undefined
+    }
+
+    let active = true
+    let unsubscribe = () => {}
+
+    async function startRealtimeSync() {
+      setLoading(true)
+      setError(null)
+
+      try {
+        await ensureDefaultProjectForUser(user.uid)
+      } catch (err) {
+        if (active) {
+          setError(err?.message || 'Impossible de preparer le projet par defaut.')
+          setLoading(false)
+        }
+        return
+      }
+
+      if (!active) return
+
+      unsubscribe = subscribeToAppData(
+        user.uid,
+        (data) => {
+          if (!active) return
+          setMembers(data.members)
+          setProjects(data.projects)
+          setTasks(data.tasks)
+          setError(null)
+          setLoading(false)
+        },
+        (err) => {
+          if (!active) return
+          const msg = err?.message || ''
+          if (msg.includes('permission') || msg.includes('Permission')) {
+            setError(
+              'Permissions Firestore refusees. Copiez firestore.rules dans Firebase Console > Firestore > Regles > Publier.',
+            )
+          } else {
+            setError(msg || 'Erreur synchronisation temps reel.')
+          }
+          setLoading(false)
+        },
+      )
+    }
+
+    startRealtimeSync()
+
+    return () => {
+      active = false
+      unsubscribe()
+    }
+  }, [user?.uid])
+
+  const createProject = useCallback(
+    async ({ name, description, memberEmails }) => {
+      if (!user?.uid) throw new Error('Utilisateur non connecte.')
+      const result = await createProjectFromEmails({
+        creatorUid: user.uid,
+        name,
+        description,
+        memberEmails,
+      })
+
+      // Mise a jour immediate de l interface (en plus du temps reel Firestore).
+      setProjects((prev) => {
+        if (prev.some((p) => p.id === result.project.id)) return prev
+        return [result.project, ...prev]
+      })
+
+      return result
+    },
+    [user?.uid],
+  )
+
+  const addTask = useCallback(async ({ projectId, task }) => {
+    await createTaskInProject({ projectId, task })
+  }, [])
+
+  const updateTask = useCallback(async ({ projectId, taskId, updates }) => {
+    await updateTaskInProject({ projectId, taskId, updates })
+  }, [])
+
+  const deleteTask = useCallback(async ({ projectId, taskId }) => {
+    await deleteTaskInProject({ projectId, taskId })
+  }, [])
+
+  const setTaskStatus = useCallback(async ({ projectId, taskId, status }) => {
+    await updateTaskInProject({ projectId, taskId, updates: { status } })
+  }, [])
 
   const value = useMemo(
     () => ({
       members,
-      setMembers,
       projects,
-      setProjects,
       tasks,
-      setTasks,
+      loading,
+      error,
+      createProject,
+      addTask,
+      updateTask,
+      deleteTask,
+      setTaskStatus,
     }),
-    [members, projects, tasks],
+    [members, projects, tasks, loading, error, createProject, addTask, updateTask, deleteTask, setTaskStatus],
   )
 
   return <AppDataContext.Provider value={value}>{children}</AppDataContext.Provider>
@@ -75,4 +144,3 @@ export function useAppData() {
   if (!ctx) throw new Error('useAppData must be used within AppDataProvider')
   return ctx
 }
-

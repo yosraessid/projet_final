@@ -1,0 +1,40 @@
+{
+  "users": {
+    "abc123firebase": {
+      "uid": "abc123firebase",
+      "name": "Yosra Essid",
+      "email": "yosra@email.com",
+      "role": "Admin",
+      "updatedAt": "2026-06-02T12:00:00.000Z"
+    },
+    "def456firebase": {
+      "uid": "def456firebase",
+      "name": "Rayen",
+      "email": "rayen@email.com",
+      "role": "Membre",
+      "updatedAt": "2026-06-02T12:00:00.000Z"
+    }
+  },
+  "projects": {
+    "102": {
+      "id": 102,
+      "name": "To-do collaborative",
+      "description": "Liste principale de l equipe",
+      "memberUids": ["abc123firebase", "def456firebase"],
+      "createdAt": "2026-06-02T12:00:00.000Z"
+    }
+  },
+  "tasks": {
+    "path": "projects/102/tasks/1001",
+    "document": {
+      "id": 1001,
+      "title": "Faire la page accueil",
+      "description": "Ecrire une presentation simple",
+      "status": "A faire",
+      "priority": "Haute",
+      "deadline": "2026-06-10",
+      "assigneeUid": "abc123firebase",
+      "createdAt": "2026-06-02T12:00:00.000Z"
+    }
+  }
+}

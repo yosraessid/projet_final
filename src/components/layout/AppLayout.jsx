@@ -5,21 +5,21 @@ import TopbarAuth from '../TopbarAuth'
 import { useTheme } from '../../context/ThemeContext'
 
 const links = [
-  { to: '/', label: 'Accueil' },
+  { to: '/', label: 'Home' },
   { to: '/dashboard', label: 'Dashboard' },
-  { to: '/groupes', label: 'Groupes / Equipes' },
-  { to: '/profil', label: 'Profil / Parametres' },
+  { to: '/groupes', label: 'Teams' },
+  { to: '/profil', label: 'Settings' },
 ]
 
 function AppLayout() {
   const { isDark, toggleTheme } = useTheme()
   const location = useLocation()
   const titleByPath = {
-    '/': 'Accueil',
-    '/auth': 'Connexion / Inscription',
-    '/dashboard': 'Tableau de bord',
-    '/groupes': 'Groupes / Equipes',
-    '/profil': 'Profil / Parametres',
+    '/': 'Home',
+    '/auth': 'Home',
+    '/dashboard': 'Dashboard',
+    '/groupes': 'Teams',
+    '/profil': 'Settings',
   }
 
   const pageTitle = titleByPath[location.pathname] || 'To-Do Liste Collaborative'

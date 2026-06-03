@@ -2,6 +2,57 @@
 
 Application frontend en React (Vite), conteneurisee avec Docker.
 
+## Backend Firebase (Auth + Firestore)
+
+Le projet utilise maintenant Firebase comme backend:
+
+- Authentification: Firebase Authentication (email/mot de passe)
+- Donnees metier: Cloud Firestore (users, projects, tasks)
+
+### Configuration rapide
+
+1. Creer un projet Firebase
+2. Activer **Authentication > Sign-in method > Email/Password**
+3. Activer **Cloud Firestore** (mode test pour commencer)
+4. Copier `.env.example` vers `.env`
+5. Remplir les variables avec les valeurs de ton projet Firebase
+
+Exemple:
+
+```bash
+cp .env.example .env
+```
+
+### Structure backend (cote front)
+
+- `src/firebase/firebaseConfig.js` : lit/valide les variables d'environnement
+- `src/firebase/firebaseClient.js` : initialise Firebase (app, auth, firestore)
+- `src/services/firebaseAuthService.js` : logique auth (login/register/logout + profil user)
+- `src/services/firebaseAppDataService.js` : logique Firestore (projects/tasks/members)
+- `src/context/AuthContext.jsx` : etat auth global (session utilisateur)
+- `src/context/AppDataContext.jsx` : etat donnees global + actions CRUD
+
+Documentation detaillee (structure + regles + exemples JSON) :
+
+- [`docs/FIRESTORE.md`](docs/FIRESTORE.md)
+
+Fichiers regles Firestore :
+
+- `firestore.rules` : regles **production** (recommandees)
+- `firestore.rules.dev` : regles **test** temporaires (debutant uniquement)
+- `firebase.json` : configuration pour deployer les regles avec Firebase CLI
+
+Deployer les regles :
+
+```bash
+npm install -g firebase-tools
+firebase login
+firebase use --add
+firebase deploy --only firestore:rules
+```
+
+Ou copier le contenu de `firestore.rules` dans Firebase Console → Firestore → Regles.
+
 ## 1) Lancer en local (sans Docker)
 
 ```bash

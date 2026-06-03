@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useNotifications } from '../context/NotificationsContext'
 import { useClickOutside } from '../hooks/useClickOutside'
+import PasswordInput from './PasswordInput'
 
 function TopbarAuth() {
   const navigate = useNavigate()
@@ -15,6 +16,8 @@ function TopbarAuth() {
   useClickOutside(containerRef, closePanel, open)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [loginError, setLoginError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const initials = user?.name
     ? user.name
@@ -25,10 +28,14 @@ function TopbarAuth() {
         .toUpperCase()
     : '?'
 
-  const handleLogin = (event) => {
+  const handleLogin = async (event) => {
     event.preventDefault()
-    const result = login(email, password)
+    setLoginError('')
+    setIsLoading(true)
+    const result = await login(email, password)
+    setIsLoading(false)
     if (!result.ok) {
+      setLoginError(result.message)
       notify('Erreur', result.message, 'warning')
       return
     }
@@ -39,8 +46,8 @@ function TopbarAuth() {
     navigate('/dashboard')
   }
 
-  const handleLogout = () => {
-    logout()
+  const handleLogout = async () => {
+    await logout()
     setOpen(false)
     notify('Deconnexion', 'A bientot !', 'info')
     navigate('/')
@@ -107,6 +114,7 @@ function TopbarAuth() {
                 <p className="auth-panel-title">Connexion rapide</p>
               </div>
               <form className="form auth-panel-form" onSubmit={handleLogin}>
+                {loginError && <p className="form-error">{loginError}</p>}
                 <label>
                   Email
                   <input
@@ -118,15 +126,17 @@ function TopbarAuth() {
                 </label>
                 <label>
                   Mot de passe
-                  <input
-                    type="password"
-                    placeholder="********"
+                  <PasswordInput
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </label>
-                <button type="submit" className="button button-primary full-width">
-                  Se connecter
+                <button
+                  type="submit"
+                  className="button button-primary full-width"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Connexion...' : 'Se connecter'}
                 </button>
               </form>
               <p className="auth-panel-footer">

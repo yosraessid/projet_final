@@ -1,6 +1,7 @@
 /* Theme tokens — dark (default) */
 :root,
 [data-theme='dark'] {
+  color-scheme: dark;
   --page-bg: radial-gradient(
       circle at 8% 10%,
       rgba(34, 211, 238, 0.2),
@@ -57,12 +58,14 @@
   --notif-bg: #0b1021;
   --notif-panel-border: #2f3b79;
   --progress-track: #0f172a;
+  --progress-ring-inner: #0d1128;
 
   --logo-shadow: 0 12px 22px rgba(124, 58, 237, 0.28);
 }
 
 /* Light mode */
 [data-theme='light'] {
+  color-scheme: light;
   --page-bg: radial-gradient(
       circle at 8% 10%,
       rgba(99, 102, 241, 0.12),
@@ -119,6 +122,7 @@
   --notif-bg: #ffffff;
   --notif-panel-border: #e2e8f0;
   --progress-track: #e2e8f0;
+  --progress-ring-inner: #f8fafc;
 
   --logo-shadow: 0 12px 22px rgba(99, 102, 241, 0.2);
 }
@@ -141,4 +145,35 @@ body {
 
 a {
   color: var(--accent);
+}
+
+.firebase-setup {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+}
+
+.firebase-setup .card {
+  max-width: 640px;
+  width: 100%;
+}
+
+.firebase-setup-steps {
+  margin: 1rem 0;
+  padding-left: 1.25rem;
+  line-height: 1.7;
+}
+
+.firebase-setup-missing {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.firebase-setup code {
+  font-family: ui-monospace, monospace;
+  font-size: 0.9em;
 }

@@ -1,37 +1,49 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useNotifications } from '../context/NotificationsContext'
 import { useAppData } from '../context/AppDataContext'
 
 function GroupsPage() {
+  const navigate = useNavigate()
   const { notify } = useNotifications()
-  const { projects, setProjects } = useAppData()
+  const { projects, createProject, loading, error } = useAppData()
   const [groupName, setGroupName] = useState('')
   const [members, setMembers] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleCreateGroup = (event) => {
+  const handleCreateGroup = async (event) => {
     event.preventDefault()
     const cleanName = groupName.trim()
     if (!cleanName) {
       notify('Erreur', 'Merci de donner un nom au groupe.', 'warning')
       return
     }
-    const count = members
-      .split(',')
-      .map((m) => m.trim())
-      .filter(Boolean).length
 
-    setProjects((prev) => [
-      {
-        id: Date.now(),
+    setIsSubmitting(true)
+    try {
+      const result = await createProject({
         name: cleanName,
         description: 'Groupe cree depuis la page Equipes',
-        members: Array.from({ length: Math.max(1, count) }, (_, i) => i + 1),
-      },
-      ...prev,
-    ])
-    setGroupName('')
-    setMembers('')
-    notify('Groupe', `Groupe "${cleanName}" cree (demo).`, 'success')
+        memberEmails: members,
+      })
+
+      let message = `Groupe "${cleanName}" cree. ${result.totalMembers} membre(s) inscrit(s).`
+      if (result.pendingEmails?.length > 0) {
+        message += ` ${result.pendingEmails.length} invitation(s) en attente: ${result.pendingEmails.join(', ')} (doivent creer un compte avec le meme email).`
+      }
+
+      notify('Groupe', message, result.pendingEmails?.length ? 'info' : 'success')
+      setGroupName('')
+      setMembers('')
+    } catch (err) {
+      const msg = err?.message || 'Echec creation groupe.'
+      const friendly = msg.includes('permission') || msg.includes('Permission')
+        ? 'Permissions refusees. Publiez le fichier firestore.rules dans Firebase.'
+        : msg
+      notify('Erreur', friendly, 'warning')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -46,6 +58,7 @@ function GroupsPage() {
               placeholder="Ex: Equipe Marketing"
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
+              required
             />
           </label>
           <label>
@@ -57,25 +70,65 @@ function GroupsPage() {
               onChange={(e) => setMembers(e.target.value)}
             />
           </label>
-          <button type="submit" className="button button-primary full-width">
-            Creer le groupe
+          <p className="muted" style={{ margin: 0 }}>
+            Separez les emails par des virgules. Si la personne n a pas encore de compte,
+            elle sera marquee &quot;en attente&quot; jusqu a son inscription.
+          </p>
+          <button
+            type="submit"
+            className="button button-primary full-width"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Creation en cours...' : 'Creer le groupe'}
           </button>
         </form>
       </article>
 
       <article className="card">
         <h2>Groupes existants</h2>
-        <ul className="group-list">
-          {projects.map((group) => (
-            <li key={group.id}>
-              <div>
-                <h3>{group.name}</h3>
-                <p>{group.members.length} membres</p>
-              </div>
-              <p>Taches partagees avec le groupe</p>
-            </li>
-          ))}
-        </ul>
+        {error && <p className="form-error">{error}</p>}
+        {loading && projects.length === 0 ? (
+          <p className="muted">Chargement des groupes...</p>
+        ) : projects.length === 0 ? (
+          <p className="muted">Aucun groupe pour le moment. Creez-en un a gauche.</p>
+        ) : (
+          <ul className="group-list">
+            {projects.map((group) => {
+              const inscrits = group.members?.length || 0
+              const enAttente = group.pendingEmails?.length || 0
+              const total = inscrits + enAttente
+
+              return (
+                <li
+                  key={group.id}
+                  className="group-list-clickable"
+                  onClick={() => navigate('/dashboard')}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      navigate('/dashboard')
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  title="Ouvrir le dashboard"
+                >
+                  <div>
+                    <h3>{group.name}</h3>
+                    <p>
+                      {total} membre(s) au total ({inscrits} inscrit(s)
+                      {enAttente > 0 ? `, ${enAttente} en attente` : ''})
+                    </p>
+                    {enAttente > 0 && (
+                      <p className="muted">En attente: {group.pendingEmails.join(', ')}</p>
+                    )}
+                    {group.description && <p className="muted">{group.description}</p>}
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+        )}
       </article>
     </section>
   )

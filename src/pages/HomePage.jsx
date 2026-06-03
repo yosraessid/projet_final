@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 
 function HomePage() {
   return (
+    // Page d accueil: presentation rapide + acces aux actions principales.
     <section className="grid-one">
       <article className="card hero-card">
         <p className="badge">To-do liste collaborative</p>
@@ -10,6 +11,7 @@ function HomePage() {
           Creez des listes, assignez des taches, suivez l avancement et recevez
           des notifications importantes, le tout dans une interface moderne.
         </p>
+        {/* Boutons de navigation vers auth et dashboard. */}
         <div className="row">
           <Link className="button button-primary" to="/auth">
             Commencer maintenant
@@ -22,6 +24,7 @@ function HomePage() {
 
       <article className="card">
         <h3>Fonctionnalites principales</h3>
+        {/* Liste concise des fonctions offertes par l application. */}
         <ul className="list">
           <li>Listes / projets de to-do</li>
           <li>Taches avec priorite, deadline et statut</li>
