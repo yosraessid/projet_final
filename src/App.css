@@ -1376,3 +1376,98 @@ td {
   .dashboard-toolbar-head { flex-direction: column; align-items: stretch; }
   .dashboard-toolbar-head .button-primary { width: 100%; }
 }
+
+/* ── Menu statut des tâches ── */
+.task-status-menu { position: relative; display: inline-block; }
+
+.task-status-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid var(--input-border);
+  border-radius: 10px;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--input-bg);
+  color: var(--text-primary);
+  transition: border-color 0.15s ease;
+}
+
+/* À faire — rouge */
+.status-trigger-todo {
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.45);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* En cours — jaune */
+.status-trigger-progress {
+  color: #eab308;
+  border-color: rgba(234, 179, 8, 0.45);
+  background: rgba(234, 179, 8, 0.1);
+}
+
+/* Terminé — vert */
+.status-trigger-done {
+  color: #22c55e;
+  border-color: rgba(34, 197, 94, 0.45);
+  background: rgba(34, 197, 94, 0.12);
+}
+
+[data-theme='light'] .status-trigger-todo     { color: #dc2626; }
+[data-theme='light'] .status-trigger-progress { color: #ca8a04; }
+[data-theme='light'] .status-trigger-done     { color: #16a34a; }
+
+.task-status-chevron { font-size: 0.75rem; opacity: 0.7; }
+
+.task-status-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 50;
+  min-width: 168px;
+  margin: 0;
+  padding: 0.35rem;
+  list-style: none;
+  background: var(--notif-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.25);
+}
+
+.task-status-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  padding: 0.5rem 0.55rem;
+  font-size: 0.92rem;
+  text-align: left;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: background 0.12s ease;
+}
+
+.task-status-option:hover { background: var(--menu-hover-bg); }
+
+.task-status-check { width: 1rem; font-weight: 700; color: var(--accent); }
+
+/* Options colorées dans le dropdown */
+.status-menu-option-todo     { color: #ef4444; }
+.status-menu-option-progress { color: #eab308; }
+.status-menu-option-done     { color: #22c55e; }
+
+[data-theme='light'] .status-menu-option-todo     { color: #dc2626; }
+[data-theme='light'] .status-menu-option-progress { color: #ea580c; }
+[data-theme='light'] .status-menu-option-done     { color: #16a34a; }
+
+.task-status-option-selected.status-menu-option-todo     { background: rgba(239, 68, 68, 0.12); }
+.task-status-option-selected.status-menu-option-progress { background: rgba(249, 115, 22, 0.12); }
+.task-status-option-selected.status-menu-option-done     { background: rgba(34, 197, 94, 0.15); }
+
+.task-status-menu-compact .task-status-trigger { font-size: 0.82rem; padding: 0.3rem 0.5rem; }

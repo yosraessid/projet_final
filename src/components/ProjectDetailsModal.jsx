@@ -209,7 +209,6 @@ function ProjectDetailsModal({
           <div className="pdm-header-content">
             <div>
               <p className="pdm-header-label">Détails du projet</p>
-              <h2 id="pdm-title" className="pdm-header-title">{title || project.name}</h2>
             </div>
             <button type="button" className="pdm-close" onClick={onClose} disabled={isSubmitting} aria-label="Fermer">×</button>
           </div>
