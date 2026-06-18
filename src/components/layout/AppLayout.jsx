@@ -28,10 +28,10 @@ import { useTheme } from '../../context/ThemeContext'
 
 /** Liens de navigation affichés dans la sidebar. */
 const links = [
-  { to: '/', label: 'Home' },
-  { to: '/dashboard', label: 'Dashboard' },
-  { to: '/groupes', label: 'Teams' },
-  { to: '/profil', label: 'Settings' },
+  { to: '/', label: 'Accueil' },
+  { to: '/dashboard', label: 'Tableau de bord' },
+  { to: '/groupes', label: 'Équipes' },
+  { to: '/profil', label: 'Paramètres' },
 ]
 
 /**
@@ -44,11 +44,11 @@ function AppLayout() {
 
   // Titre affiché dans la topbar selon le chemin URL courant.
   const titleByPath = {
-    '/': 'Home',
-    '/auth': 'Home',
-    '/dashboard': 'Dashboard',
-    '/groupes': 'Teams',
-    '/profil': 'Settings',
+    '/': 'Accueil',
+    '/auth': 'Connexion',
+    '/dashboard': 'Tableau de bord',
+    '/groupes': 'Mes équipes',
+    '/profil': 'Paramètres',
   }
 
   const pageTitle = titleByPath[location.pathname] || 'To-Do Liste Collaborative'
@@ -61,8 +61,8 @@ function AppLayout() {
         <div className="brand">
           <img className="brand-logo" src={logoWorkspace} alt="Logo" />
           <div className="brand-text">
-            <p className="brand-name">To-Do Liste</p>
-            <p className="brand-tagline">Collaborative</p>
+            <p className="brand-name">WorkSpace</p>
+            <p className="brand-tagline">Gestion collaborative</p>
           </div>
         </div>
 
