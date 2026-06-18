@@ -18,7 +18,7 @@
  */
 
 import { useMemo, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { useAppData } from '../context/AppDataContext'
 import { useAuth } from '../context/AuthContext'
 import { useNotifications } from '../context/NotificationsContext'
@@ -73,7 +73,6 @@ function parseProjectIdFromParam(value) {
 function DashboardPage() {
   const { notify } = useNotifications()
   const { user } = useAuth()
-  const navigate = useNavigate()
 
   // searchParams permet de lire/écrire les paramètres URL sans recharger la page.
   const [searchParams, setSearchParams] = useSearchParams()
@@ -161,9 +160,13 @@ function DashboardPage() {
     clearNewProjectFromUrl()
   }
 
-  /** Ouvre la page de détails du projet. */
+  /** Ouvre la modal de détails du projet en ajoutant ?project={id} à l'URL. */
   const openProjectDetails = (projectId) => {
-    navigate(`/dashboard/projet/${projectId}`)
+    setSearchParams((params) => {
+      params.delete('nouveau-projet')
+      params.set('project', String(projectId))
+      return params
+    })
   }
 
   /** Supprime le paramètre project de l'URL (fermeture de la modal). */
