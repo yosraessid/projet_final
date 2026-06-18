@@ -1,9 +1,32 @@
+/**
+ * AppLayout.jsx
+ * Layout principal partagé par toutes les pages de l'application.
+ *
+ * Structure :
+ *   ┌─────────────────────────────────────────────────┐
+ *   │  .app-shell                                     │
+ *   │  ┌──────────┐  ┌──────────────────────────────┐ │
+ *   │  │ .sidebar │  │ .main-area                   │ │
+ *   │  │  logo    │  │  ┌──────────────────────────┐ │ │
+ *   │  │  nav     │  │  │ .topbar (titre + actions)│ │ │
+ *   │  │          │  │  └──────────────────────────┘ │ │
+ *   │  │          │  │  ┌──────────────────────────┐ │ │
+ *   │  │          │  │  │ <Outlet />               │ │ │
+ *   │  │          │  │  └──────────────────────────┘ │ │
+ *   │  └──────────┘  └──────────────────────────────┘ │
+ *   └─────────────────────────────────────────────────┘
+ *
+ * La topbar affiche dynamiquement le titre de la page selon le chemin URL.
+ * Les actions en haut à droite : bouton thème, cloche de notifications, bouton auth.
+ */
+
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import logoWorkspace from '../../assets/logo-workspace.svg'
 import NotificationBell from '../NotificationBell'
 import TopbarAuth from '../TopbarAuth'
 import { useTheme } from '../../context/ThemeContext'
 
+/** Liens de navigation affichés dans la sidebar. */
 const links = [
   { to: '/', label: 'Home' },
   { to: '/dashboard', label: 'Dashboard' },
@@ -11,9 +34,15 @@ const links = [
   { to: '/profil', label: 'Settings' },
 ]
 
+/**
+ * Composant AppLayout.
+ * Rendu via <Outlet /> pour toutes les routes imbriquées sous ce layout.
+ */
 function AppLayout() {
   const { isDark, toggleTheme } = useTheme()
   const location = useLocation()
+
+  // Titre affiché dans la topbar selon le chemin URL courant.
   const titleByPath = {
     '/': 'Home',
     '/auth': 'Home',
@@ -26,7 +55,9 @@ function AppLayout() {
 
   return (
     <div className="app-shell">
+      {/* ─── Sidebar : logo + navigation ─── */}
       <aside className="sidebar">
+        {/* Identité visuelle de l'application */}
         <div className="brand">
           <img className="brand-logo" src={logoWorkspace} alt="Logo" />
           <div className="brand-text">
@@ -34,6 +65,8 @@ function AppLayout() {
             <p className="brand-tagline">Collaborative</p>
           </div>
         </div>
+
+        {/* Liens de navigation — NavLink ajoute la classe active automatiquement */}
         <nav className="menu">
           {links.map((link) => (
             <NavLink
@@ -48,10 +81,13 @@ function AppLayout() {
         </nav>
       </aside>
 
+      {/* ─── Zone principale : topbar + contenu ─── */}
       <div className="main-area">
+        {/* Barre supérieure : titre de la page + actions utilisateur */}
         <header className="topbar">
           <h1>{pageTitle}</h1>
           <div className="topbar-actions">
+            {/* Bouton bascule thème clair/sombre */}
             <button
               type="button"
               className="theme-toggle"
@@ -61,11 +97,16 @@ function AppLayout() {
             >
               {isDark ? '☀️' : '🌙'}
             </button>
+
+            {/* Cloche de notifications avec badge */}
             <NotificationBell />
+
+            {/* Bouton de connexion / menu utilisateur */}
             <TopbarAuth />
           </div>
         </header>
 
+        {/* Contenu de la page courante rendu par React Router */}
         <main className="page-container">
           <Outlet />
         </main>

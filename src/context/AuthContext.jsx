@@ -1,3 +1,23 @@
+/**
+ * AuthContext.jsx
+ * Contexte React pour la gestion de l'authentification Firebase.
+ *
+ * Fonctionnement :
+ *   - Écoute en temps réel l'état de la session Firebase via onAuthStateChanged.
+ *   - Charge le profil Firestore de l'utilisateur (nom, rôle) à chaque changement de session.
+ *   - Expose les actions login, register, resetPassword, saveProfile, logout.
+ *
+ * Valeurs exposées via useAuth() :
+ *   - user       : { uid, name, email, role } | null
+ *   - isLoggedIn : boolean
+ *   - loading    : boolean — true pendant la vérification initiale de session
+ *   - login(email, password)                          → { ok, message? }
+ *   - register(fullName, email, password, confirm)    → { ok, message? }
+ *   - resetPassword(email)                            → { ok, message }
+ *   - saveProfile({ name, role })                     → { ok, message? }
+ *   - logout()                                        → void
+ */
+
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
 import {
@@ -13,29 +33,36 @@ import { getPasswordErrorMessage, isStrongPassword } from '../utils/passwordVali
 
 const AuthContext = createContext(null)
 
+/**
+ * Extrait un nom d'affichage lisible depuis une adresse email.
+ * Ex: "yosra.essid@gmail.com" → "yosra.essid"
+ */
 function nameFromEmail(email) {
   const prefix = email?.trim()?.split('@')?.[0]
   return prefix || 'Utilisateur'
 }
 
+/**
+ * Traduit les codes d'erreur Firebase Auth en messages français lisibles.
+ */
 function firebaseErrorToFrenchMessage(err) {
   const code = err?.code
   switch (code) {
     case 'auth/invalid-email':
       return 'Email invalide.'
     case 'auth/user-not-found':
-      return "Aucun compte ne correspond a cet email."
+      return "Aucun compte ne correspond à cet email."
     case 'auth/wrong-password':
     case 'auth/invalid-credential':
       return 'Email ou mot de passe incorrect.'
     case 'auth/email-already-in-use':
-      return "Cet email est deja utilise."
+      return "Cet email est déjà utilisé."
     case 'auth/weak-password':
       return 'Mot de passe trop faible.'
     case 'auth/too-many-requests':
-      return 'Trop de tentatives. Reessayez plus tard.'
+      return 'Trop de tentatives. Réessayez plus tard.'
     default:
-      return err?.message || "Erreur d'authentification. Veuillez reessayer."
+      return err?.message || "Erreur d'authentification. Veuillez réessayer."
   }
 }
 
@@ -65,27 +92,12 @@ export function AuthProvider({ children }) {
       try {
         const profile = await getUserProfileByUid(fbUser.uid)
         if (profile?.name && profile?.email) {
-          setUser({
-            uid: fbUser.uid,
-            name: profile.name,
-            email: profile.email,
-            role: profile.role || 'Membre',
-          })
+          setUser({ uid: fbUser.uid, name: profile.name, email: profile.email, role: profile.role || 'Membre' })
         } else {
-          setUser({
-            uid: fbUser.uid,
-            name: nameFromEmail(fbUser.email),
-            email: fbUser.email,
-            role: 'Membre',
-          })
+          setUser({ uid: fbUser.uid, name: nameFromEmail(fbUser.email), email: fbUser.email, role: 'Membre' })
         }
       } catch {
-        setUser({
-          uid: fbUser.uid,
-          name: nameFromEmail(fbUser.email),
-          email: fbUser.email,
-          role: 'Membre',
-        })
+        setUser({ uid: fbUser.uid, name: nameFromEmail(fbUser.email), email: fbUser.email, role: 'Membre' })
       } finally {
         setLoading(false)
       }
@@ -99,15 +111,9 @@ export function AuthProvider({ children }) {
     if (!cleanEmail || !password.trim()) {
       return { ok: false, message: 'Merci de remplir email et mot de passe.' }
     }
-
     try {
       const profile = await loginWithEmailPassword({ email: cleanEmail, password })
-      setUser({
-        uid: profile.uid,
-        name: profile.name,
-        email: profile.email,
-        role: profile.role || 'Membre',
-      })
+      setUser({ uid: profile.uid, name: profile.name, email: profile.email, role: profile.role || 'Membre' })
       setLoading(false)
       return { ok: true }
     } catch (err) {
@@ -124,20 +130,11 @@ export function AuthProvider({ children }) {
       return { ok: false, message: 'La confirmation du mot de passe est incorrecte.' }
     }
     if (!isStrongPassword(password)) {
-      return {
-        ok: false,
-        message: getPasswordErrorMessage(password) || 'Mot de passe trop faible.',
-      }
+      return { ok: false, message: getPasswordErrorMessage(password) || 'Mot de passe trop faible.' }
     }
-
     try {
       const profile = await registerWithEmailPassword({ fullName, email, password })
-      setUser({
-        uid: profile.uid,
-        name: profile.name,
-        email: profile.email,
-        role: profile.role || 'Membre',
-      })
+      setUser({ uid: profile.uid, name: profile.name, email: profile.email, role: profile.role || 'Membre' })
       setLoading(false)
       return { ok: true }
     } catch (err) {
@@ -149,27 +146,20 @@ export function AuthProvider({ children }) {
   const resetPassword = async (email) => {
     try {
       await sendPasswordReset(email)
-      return { ok: true, message: 'Email de reinitialisation envoye. Verifiez votre boite mail.' }
+      return { ok: true, message: 'Email de réinitialisation envoyé. Vérifiez votre boîte mail.' }
     } catch (err) {
       return { ok: false, message: firebaseErrorToFrenchMessage(err) }
     }
   }
 
   const saveProfile = async ({ name, role }) => {
-    if (!user?.uid) {
-      return { ok: false, message: 'Utilisateur non connecte.' }
-    }
+    if (!user?.uid) return { ok: false, message: 'Utilisateur non connecté.' }
     try {
       const updated = await updateUserProfile({ uid: user.uid, name, role })
-      setUser({
-        uid: user.uid,
-        name: updated.name,
-        email: updated.email,
-        role: updated.role,
-      })
+      setUser({ uid: user.uid, name: updated.name, email: updated.email, role: updated.role })
       return { ok: true }
     } catch (err) {
-      return { ok: false, message: err?.message || 'Echec mise a jour profil.' }
+      return { ok: false, message: err?.message || 'Échec mise à jour profil.' }
     }
   }
 
@@ -179,16 +169,7 @@ export function AuthProvider({ children }) {
   }
 
   const value = useMemo(
-    () => ({
-      user,
-      isLoggedIn: Boolean(user),
-      loading,
-      login,
-      register,
-      resetPassword,
-      saveProfile,
-      logout: handleLogout,
-    }),
+    () => ({ user, isLoggedIn: Boolean(user), loading, login, register, resetPassword, saveProfile, logout: handleLogout }),
     [user, loading],
   )
 
