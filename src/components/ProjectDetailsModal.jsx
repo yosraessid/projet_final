@@ -294,10 +294,32 @@ function ProjectDetailsModal({
                           <select className={`pdm-priority-select ${priorityClass(t.priority || 'Moyenne')}`} value={t.priority || 'Moyenne'} onChange={(e) => handleTaskPriorityChange(t, e.target.value)} disabled={isSubmitting || editingTaskId === t.id} aria-label="Priorité">
                             {PRIORITY_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                           </select>
-                          <select className="pdm-assignee-select" value={t.assigneeId || ''} onChange={(e) => handleTaskAssigneeChange(t, e.target.value)} disabled={isSubmitting || editingTaskId === t.id} aria-label="Assigné à">
-                            <option value="">— Non assigné</option>
-                            {assignableMembers.map((m) => <option key={m.uid} value={m.uid}>{m.name}</option>)}
-                          </select>
+                          {(() => {
+                            const assignee = assignableMembers.find((m) => m.uid === t.assigneeId)
+                            if (!assignee) return (
+                              <select className="pdm-assignee-select" value="" onChange={(e) => handleTaskAssigneeChange(t, e.target.value)} disabled={isSubmitting || editingTaskId === t.id} aria-label="Assigner">
+                                <option value="">+ Assigner</option>
+                                {assignableMembers.map((m) => <option key={m.uid} value={m.uid}>{m.name}</option>)}
+                              </select>
+                            )
+                            return (
+                              <div className="pdm-assignee-chip">
+                                <span className="pdm-assignee-chip-avatar">{assignee.name.charAt(0).toUpperCase()}</span>
+                                <span className="pdm-assignee-chip-name">{assignee.name}</span>
+                                <select
+                                  className="pdm-assignee-chip-select"
+                                  value={t.assigneeId || ''}
+                                  onChange={(e) => handleTaskAssigneeChange(t, e.target.value)}
+                                  disabled={isSubmitting || editingTaskId === t.id}
+                                  aria-label="Changer l'assigné"
+                                  title="Changer l'assigné"
+                                >
+                                  <option value="">— Désassigner</option>
+                                  {assignableMembers.map((m) => <option key={m.uid} value={m.uid}>{m.name}</option>)}
+                                </select>
+                              </div>
+                            )
+                          })()}
                         </div>
                       </div>
                       <div className="pdm-task-actions">
@@ -317,15 +339,8 @@ function ProjectDetailsModal({
               </div>
 
               <div className="pdm-new-task-form">
-                <input className="pdm-input" type="text" value={newTaskTitle} onChange={(e) => setNewTaskTitle(e.target.value)} placeholder="Titre de la tâche..." onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddTask() } }} />
-                <div className="pdm-new-task-options">
-                  <select className="pdm-input pdm-select" value={newTaskPriority} onChange={(e) => setNewTaskPriority(e.target.value)} aria-label="Priorité">
-                    {PRIORITY_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-                  </select>
-                  <select className="pdm-input pdm-select" value={newTaskAssignee} onChange={(e) => setNewTaskAssignee(e.target.value)} aria-label="Assigner à">
-                    <option value="">Non assignée</option>
-                    {assignableMembers.map((m) => <option key={m.uid} value={m.uid}>{m.name}</option>)}
-                  </select>
+                <div className="pdm-add-row pdm-add-row-task">
+                  <input className="pdm-input" type="text" value={newTaskTitle} onChange={(e) => setNewTaskTitle(e.target.value)} placeholder="Titre de la tâche..." onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddTask() } }} />
                   <button type="button" className="button button-primary pdm-add-btn" onClick={handleAddTask}>+ Ajouter</button>
                 </div>
               </div>
