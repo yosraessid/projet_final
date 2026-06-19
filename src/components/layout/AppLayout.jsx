@@ -59,8 +59,8 @@ function AppLayout() {
         <div className="brand">
           <img className="brand-logo" src={logoWorkspace} alt="Logo" />
           <div className="brand-text">
-            <p className="brand-name">WorkSpace</p>
-            <p className="brand-tagline">Gestion collaborative</p>
+            <p className="brand-name">To-do Liste</p>
+            <p className="brand-tagline">collaborative</p>
           </div>
         </div>
 
