@@ -1,13 +1,30 @@
+<!--
+  index.html
+  Point d'entrée HTML de l'application React (Single Page Application).
+
+  Structure :
+    - lang="fr" : langue française pour l'accessibilité et le SEO.
+    - data-theme="dark" : thème sombre par défaut (modifié dynamiquement par ThemeContext).
+    - <div id="root"> : conteneur où React monte l'arbre de composants.
+    - Le script main.jsx est chargé en mode module ES (import/export natif).
+
+  Le favicon utilise un fichier SVG pour une meilleure qualité sur tous les écrans.
+-->
 <!doctype html>
 <html lang="fr" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
+    <!-- Favicon SVG — vectoriel, net sur tous les écrans (retina inclus) -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Viewport responsive — adapte le rendu aux mobiles et tablettes -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Titre affiché dans l'onglet du navigateur -->
     <title>WorkSpace — To-Do Collaborative</title>
   </head>
   <body>
+    <!-- Conteneur racine où React monte l'application -->
     <div id="root"></div>
+    <!-- Point d'entrée JavaScript — Vite gère le bundling et le HMR -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
