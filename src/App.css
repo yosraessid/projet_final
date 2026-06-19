@@ -1687,3 +1687,511 @@ td {
   place-items: center;
   border-radius: 8px;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN — Desktop / Tablette / Téléphone
+   ═══════════════════════════════════════════════════════════════════════════════
+   Breakpoints :
+     - > 900px       : Desktop (layout complet avec sidebar)
+     - 641px – 900px : Tablette (sidebar horizontale, grilles adaptées)
+     - ≤ 640px       : Téléphone (tout en colonne, tailles réduites)
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── TABLETTE (641px – 900px) ──────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  /* Shell : supprime la grille 2 colonnes, passe en colonne unique */
+  .app-shell {
+    width: 98%;
+    margin: 0.75rem auto;
+    padding: 0.6rem;
+    border-radius: 16px;
+    gap: 0.75rem;
+  }
+
+  /* Sidebar : devient horizontale en haut */
+  .sidebar {
+    border-radius: 14px;
+    padding: 0.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  /* Brand : alignement horizontal compact */
+  .brand {
+    margin: 0;
+    gap: 0.5rem;
+  }
+
+  .brand-logo {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+
+  .brand-name {
+    font-size: 0.95rem;
+  }
+
+  .brand-tagline {
+    font-size: 0.75rem;
+  }
+
+  /* Menu horizontal sur tablette */
+  .menu {
+    flex: 1;
+    justify-content: flex-end;
+    gap: 0.4rem;
+  }
+
+  .menu-link {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.88rem;
+    border-radius: 8px;
+  }
+
+  .menu-dot {
+    width: 7px;
+    height: 7px;
+  }
+
+  /* Topbar */
+  .topbar {
+    border-radius: 14px;
+    padding: 0.75rem 0.85rem;
+  }
+
+  .topbar h1 {
+    font-size: 1.5rem;
+  }
+
+  /* Cards et grilles */
+  .project-cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0.85rem;
+  }
+
+  /* Kanban 2 colonnes sur tablette */
+  .kanban-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Stats 2 colonnes */
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+  }
+
+  /* Widget grid en colonne */
+  .widget-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Project page body : 1 colonne sur tablette */
+  .project-page-body {
+    grid-template-columns: 1fr;
+  }
+
+  .project-page-col {
+    max-height: none;
+  }
+
+  /* Notifications panel */
+  .notif-panel {
+    right: 1rem;
+    width: min(380px, calc(100vw - 2rem));
+  }
+}
+
+/* ── TÉLÉPHONE (≤ 640px) ───────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Shell : plein écran, pas de marge ni border-radius */
+  .app-shell {
+    width: 100%;
+    margin: 0;
+    padding: 0.5rem;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    gap: 0.5rem;
+  }
+
+  /* Sidebar : barre horizontale compacte */
+  .sidebar {
+    border-radius: 12px;
+    padding: 0.6rem 0.7rem;
+    gap: 0.5rem;
+  }
+
+  /* Brand encore plus compact */
+  .brand {
+    gap: 0.4rem;
+  }
+
+  .brand-logo {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+  }
+
+  .brand-name {
+    font-size: 0.85rem;
+  }
+
+  .brand-tagline {
+    font-size: 0.68rem;
+  }
+
+  /* Menu : icônes seules ou texte réduit */
+  .menu {
+    gap: 0.3rem;
+  }
+
+  .menu-link {
+    padding: 0.35rem 0.5rem;
+    font-size: 0.8rem;
+    gap: 0.35rem;
+  }
+
+  .menu-dot {
+    width: 6px;
+    height: 6px;
+  }
+
+  /* Topbar : empilé */
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+    padding: 0.65rem 0.75rem;
+    border-radius: 12px;
+  }
+
+  .topbar h1 {
+    font-size: 1.2rem;
+    text-align: center;
+  }
+
+  .topbar-actions {
+    justify-content: center;
+    gap: 0.6rem;
+  }
+
+  /* Boutons topbar plus petits */
+  .theme-toggle,
+  .notification-btn,
+  .auth-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+
+  /* Cards */
+  .card {
+    border-radius: 12px;
+    padding: 0.9rem;
+  }
+
+  /* Grilles en 1 colonne */
+  .grid-two,
+  .kanban-grid,
+  .widget-grid,
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Stats cards compactes */
+  .stat-card {
+    min-height: 72px;
+    padding: 0.6rem 0.5rem;
+  }
+
+  .stat-card h3 {
+    font-size: 1.2rem;
+  }
+
+  /* Cartes projet */
+  .project-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+  }
+
+  .project-card-v2-body {
+    padding: 0.85rem 0.9rem 0.65rem;
+  }
+
+  .project-card-v2-title {
+    font-size: 0.95rem;
+  }
+
+  .project-card-v2-footer {
+    padding: 0.5rem 0.9rem 0.7rem;
+  }
+
+  /* Dashboard toolbar */
+  .dashboard-toolbar-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+
+  .dashboard-toolbar-head .button-primary {
+    width: 100%;
+    text-align: center;
+  }
+
+  .dashboard-welcome h2 {
+    font-size: 1.1rem;
+  }
+
+  .dashboard-search {
+    padding: 0.5rem 0.7rem;
+    border-radius: 10px;
+  }
+
+  /* Formulaires plein écran */
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form input,
+  .form select,
+  .form textarea {
+    padding: 0.55rem 0.6rem;
+    font-size: 0.9rem;
+  }
+
+  /* Boutons pleine largeur sur mobile */
+  .button {
+    padding: 0.55rem 0.85rem;
+    font-size: 0.88rem;
+  }
+
+  /* Auth page : colonnes empilées */
+  .grid-two > .card {
+    width: 100%;
+  }
+
+  /* Profile */
+  .profile-avatar-wrap {
+    padding: 0.65rem 0.75rem;
+    gap: 0.75rem;
+  }
+
+  .profile-avatar {
+    width: 48px;
+    height: 48px;
+    font-size: 1.1rem;
+  }
+
+  /* Notifications panel : plein écran mobile */
+  .notif-panel {
+    position: fixed;
+    right: 0;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+    z-index: 600;
+  }
+
+  .notif-header {
+    padding: 0.75rem 0.85rem 0.6rem;
+  }
+
+  /* Auth panel plein écran */
+  .auth-panel {
+    position: fixed;
+    right: 0;
+    left: 0;
+    top: auto;
+    bottom: 0;
+    width: 100%;
+    border-radius: 16px 16px 0 0;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  /* Modal overlay */
+  .modal-overlay {
+    padding: 0.5rem;
+    align-items: flex-end;
+  }
+
+  .modal-card {
+    width: 100%;
+    max-height: 85vh;
+    border-radius: 16px 16px 0 0;
+    padding: 1rem;
+  }
+
+  /* PDM (Project Details Modal) */
+  .pdm-shell {
+    width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .pdm-header-content {
+    padding: 0.85rem 1rem 0.7rem;
+  }
+
+  .pdm-header-title {
+    font-size: 1.05rem;
+  }
+
+  .pdm-col {
+    padding: 0.85rem 1rem;
+    gap: 1rem;
+  }
+
+  .pdm-task-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+    padding: 0.55rem 0.6rem;
+  }
+
+  .pdm-task-main {
+    width: 100%;
+  }
+
+  .pdm-task-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .pdm-task-meta {
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .pdm-add-row {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+  }
+
+  .pdm-add-row-task {
+    grid-template-columns: 1fr;
+  }
+
+  .pdm-new-task-options {
+    grid-template-columns: 1fr;
+  }
+
+  .pdm-footer {
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .pdm-footer-actions {
+    width: 100%;
+    flex-direction: column-reverse;
+  }
+
+  .pdm-footer-actions .button,
+  .pdm-footer .button-danger-outline {
+    width: 100%;
+  }
+
+  /* Project page */
+  .project-page-body {
+    grid-template-columns: 1fr;
+  }
+
+  .project-page-col {
+    max-height: none;
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  .project-page-footer {
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 0.75rem;
+    border-radius: 12px;
+  }
+
+  .project-page-footer .pdm-footer-actions {
+    width: 100%;
+    flex-direction: column-reverse;
+  }
+
+  .project-page-footer .button {
+    width: 100%;
+  }
+
+  /* Kanban compact sur mobile */
+  .kanban-column {
+    padding: 0.7rem;
+    border-radius: 12px;
+  }
+
+  .kanban-item {
+    padding: 0.55rem;
+    border-radius: 8px;
+  }
+
+  /* Confirm dialog */
+  .confirm-card {
+    width: 100%;
+    padding: 1.25rem 1rem 1rem;
+    border-radius: 12px;
+  }
+
+  /* Tables */
+  .table-wrap {
+    font-size: 0.85rem;
+  }
+
+  th, td {
+    padding: 0.55rem 0.3rem;
+    font-size: 0.82rem;
+  }
+
+  /* Progress ring compact */
+  .progress-ring {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+/* ── TRÈS PETIT ÉCRAN (≤ 380px) ────────────────────────────────────────────── */
+@media (max-width: 380px) {
+  .topbar h1 {
+    font-size: 1rem;
+  }
+
+  .brand-name {
+    font-size: 0.78rem;
+  }
+
+  .brand-tagline {
+    display: none;
+  }
+
+  .menu-link {
+    padding: 0.3rem 0.4rem;
+    font-size: 0.72rem;
+  }
+
+  .dashboard-welcome h2 {
+    font-size: 0.95rem;
+  }
+
+  .project-card-v2-title {
+    font-size: 0.88rem;
+  }
+
+  .pdm-header-title {
+    font-size: 0.95rem;
+  }
+
+  .button {
+    padding: 0.5rem 0.7rem;
+    font-size: 0.82rem;
+  }
+}
