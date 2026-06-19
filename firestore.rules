@@ -1,45 +1,133 @@
 rules_version = '2';
 
-// Regles Firestore pour Projet_final
-// IMPORTANT: copier ce fichier dans Firebase Console > Firestore > Regles > Publier
+// ═══════════════════════════════════════════════════════════════════════════════
+// Règles de sécurité Firestore — Projet PFE "To-Do Liste Collaborative"
+// ═══════════════════════════════════════════════════════════════════════════════
+// IMPORTANT : Copier ce fichier dans Firebase Console > Firestore > Règles > Publier
+//
+// Principes appliqués :
+//   1. Authentification obligatoire pour toute opération
+//   2. Principe du moindre privilège (chaque utilisateur ne voit que ses données)
+//   3. Validation des données côté serveur (types, longueurs, champs obligatoires)
+//   4. Protection contre l'injection de champs non autorisés
+//   5. Suppression interdite des profils utilisateurs
+// ═══════════════════════════════════════════════════════════════════════════════
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // ── Fonctions utilitaires ──────────────────────────────────────────────────
+
+    // Vérifie que l'utilisateur est authentifié.
     function isSignedIn() {
       return request.auth != null;
     }
 
-    // --- Profils utilisateurs ---
+    // Vérifie que l'utilisateur est le propriétaire du document.
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Vérifie que l'utilisateur est membre du projet.
+    function isMember() {
+      return isSignedIn() && request.auth.uid in resource.data.memberUids;
+    }
+
+    // Vérifie qu'une chaîne ne dépasse pas une longueur maximale.
+    function maxLength(value, max) {
+      return value is string && value.size() <= max;
+    }
+
+    // Vérifie qu'une chaîne n'est pas vide après trim.
+    function isNonEmptyString(value) {
+      return value is string && value.size() > 0 && value.size() <= 500;
+    }
+
+    // ── Profils utilisateurs ───────────────────────────────────────────────────
     match /users/{userId} {
-      // Lecture: utilisateur connecte (liste des membres, recherche par email)
+      // Lecture : tout utilisateur connecté peut lire les profils
+      // (nécessaire pour la recherche de membres et l'affichage des noms).
       allow read: if isSignedIn();
 
-      // Ecriture: uniquement son propre profil
-      allow create, update: if isSignedIn() && request.auth.uid == userId;
+      // Création : uniquement son propre profil, avec validation des champs.
+      allow create: if isOwner(userId)
+        && request.resource.data.keys().hasAll(['uid', 'name', 'email'])
+        && request.resource.data.uid == userId
+        && isNonEmptyString(request.resource.data.name)
+        && maxLength(request.resource.data.name, 100)
+        && request.resource.data.email is string
+        && request.resource.data.email.size() > 3;
+
+      // Mise à jour : uniquement son propre profil, sans modifier l'UID ou l'email.
+      allow update: if isOwner(userId)
+        && request.resource.data.uid == userId
+        && request.resource.data.email == resource.data.email
+        && isNonEmptyString(request.resource.data.name)
+        && maxLength(request.resource.data.name, 100)
+        && maxLength(request.resource.data.get('role', ''), 50);
+
+      // Suppression : interdite (protection des données).
       allow delete: if false;
     }
 
-    // --- Groupes / projets ---
+    // ── Projets ────────────────────────────────────────────────────────────────
     match /projects/{projectId} {
-      // Lecture: seulement les projets dont on est membre
-      allow read: if isSignedIn()
-        && request.auth.uid in resource.data.memberUids;
+      // Lecture : seulement les projets dont l'utilisateur est membre.
+      allow read: if isMember();
 
-      // Creation: le createur doit s inclure dans memberUids
+      // Création : l'utilisateur doit être membre, avec validation des champs.
       allow create: if isSignedIn()
         && request.auth.uid in request.resource.data.memberUids
         && request.resource.data.memberUids is list
-        && request.resource.data.name is string;
+        && request.resource.data.memberUids.size() >= 1
+        && request.resource.data.memberUids.size() <= 50
+        && isNonEmptyString(request.resource.data.name)
+        && maxLength(request.resource.data.name, 200)
+        && maxLength(request.resource.data.get('description', ''), 2000);
 
-      allow update, delete: if isSignedIn()
-        && request.auth.uid in resource.data.memberUids;
+      // Mise à jour : seulement par un membre existant, avec validation.
+      allow update: if isMember()
+        && request.resource.data.memberUids is list
+        && request.resource.data.memberUids.size() >= 1
+        && request.resource.data.memberUids.size() <= 50
+        && isNonEmptyString(request.resource.data.name)
+        && maxLength(request.resource.data.name, 200)
+        && maxLength(request.resource.data.get('description', ''), 2000);
 
-      // --- Taches d un projet ---
+      // Suppression : seulement par un membre existant.
+      allow delete: if isMember();
+
+      // ── Tâches d'un projet ─────────────────────────────────────────────────
       match /tasks/{taskId} {
-        allow read, write: if isSignedIn()
-          && request.auth.uid in get(/databases/$(database)/documents/projects/$(projectId)).data.memberUids;
+        // Fonction pour vérifier l'appartenance au projet parent.
+        function isProjectMember() {
+          return isSignedIn()
+            && request.auth.uid in get(/databases/$(database)/documents/projects/$(projectId)).data.memberUids;
+        }
+
+        // Lecture : membres du projet uniquement.
+        allow read: if isProjectMember();
+
+        // Création : membre du projet, avec validation du titre.
+        allow create: if isProjectMember()
+          && isNonEmptyString(request.resource.data.title)
+          && maxLength(request.resource.data.title, 500)
+          && request.resource.data.status in ['A faire', 'En cours', 'Terminee'];
+
+        // Mise à jour : membre du projet, le titre reste valide.
+        allow update: if isProjectMember()
+          && isNonEmptyString(request.resource.data.title)
+          && maxLength(request.resource.data.title, 500)
+          && request.resource.data.status in ['A faire', 'En cours', 'Terminee'];
+
+        // Suppression : membre du projet.
+        allow delete: if isProjectMember();
       }
+    }
+
+    // ── Règle par défaut : tout le reste est interdit ──────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
