@@ -2027,101 +2027,283 @@ td {
     padding: 1rem;
   }
 
-  /* PDM (Project Details Modal) */
+  /* PDM (Project Details Modal) — mobile */
   .pdm-shell {
     width: 100%;
     max-height: 100vh;
     border-radius: 0;
   }
 
+  .pdm-header-bar {
+    height: 3px;
+  }
+
   .pdm-header-content {
-    padding: 0.85rem 1rem 0.7rem;
+    padding: 0.7rem 0.85rem 0.6rem;
+  }
+
+  .pdm-header-label {
+    font-size: 0.68rem;
   }
 
   .pdm-header-title {
-    font-size: 1.05rem;
+    font-size: 1rem;
+  }
+
+  .pdm-close {
+    font-size: 1.1rem;
+    padding: 0.2rem 0.45rem;
   }
 
   .pdm-col {
-    padding: 0.85rem 1rem;
-    gap: 1rem;
+    padding: 0.75rem 0.85rem;
+    gap: 0.85rem;
+  }
+
+  .pdm-section {
+    gap: 0.5rem;
+  }
+
+  .pdm-section-title {
+    font-size: 0.75rem;
+    margin-bottom: 0.1rem;
+  }
+
+  /* Champs titre / description / date — bien lisibles sur mobile */
+  .pdm-fields {
+    gap: 0.55rem;
+  }
+
+  .pdm-label {
+    font-size: 0.8rem;
+    gap: 0.25rem;
+  }
+
+  .pdm-input {
+    font-size: 0.88rem;
+    padding: 0.55rem 0.65rem;
+    border-radius: 8px;
+  }
+
+  .pdm-textarea {
+    min-height: 70px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+
+  .pdm-select {
+    font-size: 0.85rem;
+  }
+
+  /* Membres — bien espacés et lisibles */
+  .pdm-member-list {
+    max-height: 140px;
+    gap: 0.4rem;
+  }
+
+  .pdm-member-item {
+    padding: 0.45rem 0.55rem;
+    gap: 0.55rem;
+    border-radius: 8px;
+  }
+
+  .pdm-member-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 0.7rem;
+  }
+
+  .pdm-member-info {
+    gap: 0.05rem;
+  }
+
+  .pdm-member-name {
+    font-size: 0.82rem;
+  }
+
+  .pdm-member-role {
+    font-size: 0.7rem;
+  }
+
+  .pdm-member-remove {
+    font-size: 1rem;
+    padding: 0.15rem 0.35rem;
+  }
+
+  /* Ajout membre — champs empilés */
+  .pdm-add-row {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+  }
+
+  .pdm-add-row .pdm-select {
+    width: 100%;
+  }
+
+  .pdm-add-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.92rem;
+    width: 100%;
+  }
+
+  .pdm-hint {
+    font-size: 0.7rem;
+    line-height: 1.3;
+  }
+
+  .pdm-member-name {
+    font-size: 0.8rem;
+  }
+
+  .pdm-member-role {
+    font-size: 0.68rem;
+  }
+
+  /* Tâches — layout empilé */
+  .pdm-task-list {
+    max-height: 200px;
+    gap: 0.35rem;
   }
 
   .pdm-task-item {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.4rem;
-    padding: 0.55rem 0.6rem;
+    gap: 0.35rem;
+    padding: 0.5rem 0.55rem;
   }
 
   .pdm-task-main {
     width: 100%;
+    gap: 0.2rem;
+  }
+
+  .pdm-task-title {
+    font-size: 0.82rem;
   }
 
   .pdm-task-actions {
     width: 100%;
     justify-content: flex-end;
+    gap: 0.3rem;
   }
 
   .pdm-task-meta {
     flex-wrap: wrap;
-    gap: 0.35rem;
+    gap: 0.3rem;
   }
 
+  .pdm-priority-select {
+    font-size: 0.65rem;
+    padding: 0.12rem 1rem 0.12rem 0.35rem;
+  }
+
+  .pdm-assignee-select {
+    font-size: 0.65rem;
+    max-width: 90px;
+    padding: 0.12rem 1rem 0.12rem 0.35rem;
+  }
+
+  .pdm-assignee-chip {
+    padding: 0.15rem 0.4rem 0.15rem 0.25rem;
+  }
+
+  .pdm-assignee-chip-avatar {
+    width: 16px;
+    height: 16px;
+    font-size: 0.55rem;
+  }
+
+  .pdm-assignee-chip-name {
+    font-size: 0.68rem;
+    max-width: 60px;
+  }
+
+  /* Formulaire ajout tâche/membre */
   .pdm-add-row {
     grid-template-columns: 1fr;
-    gap: 0.4rem;
+    gap: 0.35rem;
   }
 
   .pdm-add-row-task {
     grid-template-columns: 1fr;
   }
 
-  .pdm-new-task-options {
-    grid-template-columns: 1fr;
+  .pdm-add-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.92rem;
+    width: 100%;
   }
 
+  .pdm-new-task-options {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .pdm-hint {
+    font-size: 0.7rem;
+  }
+
+  /* Footer */
   .pdm-footer {
     flex-direction: column;
-    gap: 0.6rem;
-    padding: 0.75rem 1rem;
+    gap: 0.5rem;
+    padding: 0.65rem 0.85rem;
   }
 
   .pdm-footer-actions {
     width: 100%;
     flex-direction: column-reverse;
+    gap: 0.4rem;
   }
 
   .pdm-footer-actions .button,
   .pdm-footer .button-danger-outline {
     width: 100%;
+    text-align: center;
   }
 
-  /* Project page */
+  /* Project page (pleine page) — mobile */
+  .project-page-header {
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+  }
+
+  .project-page-back {
+    font-size: 0.82rem;
+  }
+
   .project-page-body {
     grid-template-columns: 1fr;
+    gap: 0.75rem;
   }
 
   .project-page-col {
     max-height: none;
-    padding: 1rem;
+    padding: 0.85rem;
     border-radius: 12px;
+    gap: 1rem;
+  }
+
+  .project-page-task-list {
+    max-height: 250px;
   }
 
   .project-page-footer {
     flex-direction: column;
-    gap: 0.6rem;
-    padding: 0.75rem;
+    gap: 0.5rem;
+    padding: 0.65rem 0.85rem;
     border-radius: 12px;
   }
 
   .project-page-footer .pdm-footer-actions {
     width: 100%;
     flex-direction: column-reverse;
+    gap: 0.4rem;
   }
 
   .project-page-footer .button {
     width: 100%;
+    text-align: center;
   }
 
   /* Kanban compact sur mobile */
@@ -2186,12 +2368,177 @@ td {
     font-size: 0.88rem;
   }
 
-  .pdm-header-title {
-    font-size: 0.95rem;
-  }
-
   .button {
     padding: 0.5rem 0.7rem;
     font-size: 0.82rem;
+  }
+
+  /* Page détails projet — très petit écran */
+  .pdm-header-content {
+    padding: 0.55rem 0.65rem 0.45rem;
+  }
+
+  .pdm-header-label {
+    font-size: 0.6rem;
+  }
+
+  .pdm-header-title {
+    font-size: 0.88rem;
+  }
+
+  .pdm-col {
+    padding: 0.55rem 0.65rem;
+    gap: 0.65rem;
+  }
+
+  .pdm-section {
+    gap: 0.4rem;
+  }
+
+  .pdm-section-title {
+    font-size: 0.68rem;
+    gap: 0.25rem;
+  }
+
+  .pdm-section-icon {
+    font-size: 0.78rem;
+  }
+
+  /* Champs titre / description — très petit écran */
+  .pdm-fields {
+    gap: 0.45rem;
+  }
+
+  .pdm-label {
+    font-size: 0.75rem;
+    gap: 0.2rem;
+  }
+
+  .pdm-input {
+    font-size: 0.82rem;
+    padding: 0.45rem 0.5rem;
+    border-radius: 7px;
+  }
+
+  .pdm-textarea {
+    min-height: 55px;
+    font-size: 0.8rem;
+  }
+
+  /* Membres — très petit écran */
+  .pdm-member-list {
+    max-height: 110px;
+    gap: 0.3rem;
+  }
+
+  .pdm-member-item {
+    padding: 0.35rem 0.45rem;
+    gap: 0.4rem;
+    border-radius: 7px;
+  }
+
+  .pdm-member-avatar {
+    width: 22px;
+    height: 22px;
+    font-size: 0.6rem;
+  }
+
+  .pdm-member-name {
+    font-size: 0.75rem;
+  }
+
+  .pdm-member-role {
+    font-size: 0.62rem;
+  }
+
+  .pdm-member-remove {
+    font-size: 0.9rem;
+  }
+
+  .pdm-add-btn {
+    font-size: 0.82rem;
+    padding: 0.42rem 0.6rem;
+  }
+
+  .pdm-hint {
+    font-size: 0.65rem;
+  }
+
+  .pdm-stat-row {
+    gap: 0.3rem;
+  }
+
+  .pdm-stat-item {
+    padding: 0.4rem 0.25rem;
+    border-radius: 8px;
+  }
+
+  .pdm-stat-num {
+    font-size: 0.95rem;
+  }
+
+  .pdm-stat-dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .pdm-task-item {
+    padding: 0.4rem 0.45rem;
+    border-radius: 8px;
+  }
+
+  .pdm-task-title {
+    font-size: 0.78rem;
+  }
+
+  .pdm-priority-select {
+    font-size: 0.6rem;
+    padding: 0.1rem 0.9rem 0.1rem 0.3rem;
+  }
+
+  .pdm-assignee-select {
+    font-size: 0.6rem;
+    max-width: 75px;
+  }
+
+  .pdm-member-avatar {
+    width: 22px;
+    height: 22px;
+    font-size: 0.6rem;
+  }
+
+  .pdm-member-name {
+    font-size: 0.75rem;
+  }
+
+  .pdm-add-btn {
+    font-size: 0.85rem;
+    padding: 0.45rem 0.65rem;
+  }
+
+  .pdm-footer {
+    padding: 0.55rem 0.7rem;
+  }
+
+  .project-page-col {
+    padding: 0.7rem;
+    gap: 0.8rem;
+    border-radius: 10px;
+  }
+
+  .project-page-header {
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+  }
+
+  .project-page-footer {
+    padding: 0.55rem 0.7rem;
+    border-radius: 10px;
+  }
+
+  /* TaskStatusMenu compact sur très petit écran */
+  .task-status-menu-compact .task-status-trigger {
+    font-size: 0.72rem;
+    padding: 0.22rem 0.4rem;
   }
 }
