@@ -30,6 +30,7 @@ import {
 } from '../services/firebaseAuthService'
 import { getFirebaseAuth, isFirebaseConfigured } from '../firebase/firebaseClient'
 import { getPasswordErrorMessage, isStrongPassword } from '../utils/passwordValidation'
+import { logSecurityEvent } from '../utils/securityLogger'
 
 const AuthContext = createContext(null)
 
@@ -115,9 +116,11 @@ export function AuthProvider({ children }) {
       const profile = await loginWithEmailPassword({ email: cleanEmail, password })
       setUser({ uid: profile.uid, name: profile.name, email: profile.email, role: profile.role || 'Membre' })
       setLoading(false)
+      logSecurityEvent('login_success', { email: cleanEmail })
       return { ok: true }
     } catch (err) {
       setLoading(false)
+      logSecurityEvent('login_failed', { email: cleanEmail, reason: err?.code || 'unknown' })
       return { ok: false, message: firebaseErrorToFrenchMessage(err) }
     }
   }
@@ -125,6 +128,11 @@ export function AuthProvider({ children }) {
   const register = async (fullName, email, password, confirmPassword) => {
     if (!fullName.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
       return { ok: false, message: 'Merci de remplir tous les champs.' }
+    }
+    // Validation format email avant d'appeler Firebase.
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
+    if (!emailRegex.test(email.trim())) {
+      return { ok: false, message: 'Format email invalide (ex: nom@domaine.com).' }
     }
     if (password !== confirmPassword) {
       return { ok: false, message: 'La confirmation du mot de passe est incorrecte.' }

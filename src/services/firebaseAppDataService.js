@@ -34,6 +34,7 @@ import {
   where,
 } from 'firebase/firestore'
 import { getFirebaseDb } from '../firebase/firebaseClient'
+import { sanitizeText, isSafeInput } from '../utils/sanitize'
 
 /**
  * Vérifie que Firestore est initialisé et le retourne.
@@ -346,8 +347,9 @@ export async function createProjectFromEmails({
   deadline,
 }) {
   const db = requireDb()
-  const cleanName = name.trim()
+  const cleanName = sanitizeText(name, 200)
   if (!cleanName) throw new Error('Nom du groupe manquant.')
+  if (!isSafeInput(cleanName)) throw new Error('Le nom contient des caractères non autorisés.')
 
   const projectId = Date.now()
   // Le créateur est toujours membre.
@@ -417,11 +419,14 @@ export async function createProjectFromEmails({
 export async function createTaskInProject({ projectId, task }) {
   const db = requireDb()
   const taskId = task.id ?? Date.now()
+  const cleanTitle = sanitizeText(task.title, 500)
+  if (!cleanTitle) throw new Error('Titre de la tâche manquant.')
+  if (!isSafeInput(cleanTitle)) throw new Error('Le titre contient des caractères non autorisés.')
   const ref = doc(db, 'projects', String(projectId), 'tasks', String(taskId))
   await setDoc(ref, {
     id: taskId,
-    title: task.title,
-    description: task.description,
+    title: cleanTitle,
+    description: sanitizeText(task.description || '', 2000),
     status: task.status,
     priority: task.priority,
     deadline: task.deadline,
