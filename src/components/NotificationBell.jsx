@@ -66,64 +66,42 @@ function NotificationBell() {
         {unreadCount > 0 && <span className="notif-badge">{unreadCount}</span>}
       </button>
 
-      {/* Panneau déroulant des notifications — rendu via portal pour éviter les contraintes CSS */}
       {open && createPortal(
         <div className="notif-panel" role="dialog" aria-label="Panneau notifications">
-          {/* En-tête du panneau avec les actions */}
+          {/* ── Header fixe ── */}
           <div className="notif-header">
-            <p>
-              <span aria-hidden="true">🔔</span> Notifications
-            </p>
+            <p><span aria-hidden="true">🔔</span> Notifications {unreadCount > 0 && <span className="notif-header-count">{unreadCount}</span>}</p>
             <div className="notif-actions">
-              <button type="button" className="link-btn" onClick={markAllRead}>
-                Tout lire
-              </button>
-              <button type="button" className="link-btn" onClick={clearAll}>
-                Effacer
-              </button>
-              <button
-                type="button"
-                className="notif-panel-close"
-                onClick={() => setOpen(false)}
-                aria-label="Fermer le panneau de notifications"
-                title="Fermer"
-              >
-                ×
-              </button>
+              <button type="button" className="link-btn" onClick={markAllRead}>Tout lire</button>
+              <button type="button" className="link-btn" onClick={clearAll}>Effacer</button>
+              <button type="button" className="notif-panel-close" onClick={() => setOpen(false)} aria-label="Fermer" title="Fermer">×</button>
             </div>
           </div>
 
-          {items.length === 0 ? (
-            <p className="notif-empty">Aucune notification pour le moment.</p>
-          ) : (
-            <ul className="notif-list">
-              {items.map((n) => (
-                <li
-                  key={n.id}
-                  className={n.read ? 'notif-item' : 'notif-item notif-item-unread'}
-                >
-                  <div className="notif-item-top">
-                    <span className={`pill pill-${n.level}`}>{n.title}</span>
-                    <div className="notif-item-right">
-                      <span className="muted">
-                        {new Date(n.createdAt).toLocaleTimeString()}
-                      </span>
-                      <button
-                        type="button"
-                        className="notif-dismiss"
-                        onClick={() => dismissOne(n.id)}
-                        aria-label={`Fermer la notification ${n.title}`}
-                        title="Fermer"
-                      >
-                        ×
-                      </button>
+          {/* ── Liste scrollable ── */}
+          <div className="notif-scroll-area">
+            {items.length === 0 ? (
+              <div className="notif-empty-state">
+                <span aria-hidden="true" className="notif-empty-icon">🔕</span>
+                <p className="notif-empty">Aucune notification pour le moment.</p>
+              </div>
+            ) : (
+              <ul className="notif-list">
+                {items.map((n) => (
+                  <li key={n.id} className={n.read ? 'notif-item' : 'notif-item notif-item-unread'}>
+                    <div className="notif-item-top">
+                      <span className={`pill pill-${n.level}`}>{n.title}</span>
+                      <div className="notif-item-right">
+                        <span className="muted">{new Date(n.createdAt).toLocaleTimeString()}</span>
+                        <button type="button" className="notif-dismiss" onClick={() => dismissOne(n.id)} aria-label={`Fermer ${n.title}`} title="Fermer">×</button>
+                      </div>
                     </div>
-                  </div>
-                  <p className="notif-message">{n.message}</p>
-                </li>
-              ))}
-            </ul>
-          )}
+                    <p className="notif-message">{n.message}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>,
         document.body
       )}

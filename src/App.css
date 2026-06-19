@@ -861,15 +861,76 @@ td {
   position: fixed;
   right: 1.5rem;
   top: 72px;
-  width: 360px;
+  width: 380px;
   max-height: calc(100vh - 90px);
-  overflow-y: auto;
-  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
   border: 1px solid var(--notif-panel-border);
   background: var(--notif-bg);
-  box-shadow: 0 8px 32px rgba(2,6,23,0.45);
-  padding: 0.75rem;
+  box-shadow: 0 8px 32px rgba(2,6,23,0.45), 0 0 0 1px rgba(255,255,255,0.04);
+  overflow: hidden;
   z-index: 500;
+  animation: notif-slide-in 0.18s ease;
+}
+
+@keyframes notif-slide-in {
+  from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+
+/* Header fixe — ne défile pas */
+.notif-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem 0.7rem;
+  border-bottom: 1px solid var(--divider, var(--shell-border));
+  flex-shrink: 0;
+  background: var(--notif-bg);
+}
+
+/* Zone scrollable */
+.notif-scroll-area {
+  overflow-y: auto;
+  flex: 1;
+  padding: 0.6rem 0.75rem 0.75rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--btn-light-border) transparent;
+}
+
+.notif-scroll-area::-webkit-scrollbar { width: 4px; }
+.notif-scroll-area::-webkit-scrollbar-track { background: transparent; }
+.notif-scroll-area::-webkit-scrollbar-thumb { background: var(--btn-light-border); border-radius: 4px; }
+
+/* État vide */
+.notif-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.notif-empty-icon { font-size: 2rem; opacity: 0.5; }
+
+/* Badge compteur dans le header */
+.notif-header-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0 0.3rem;
+  margin-left: 0.35rem;
+  vertical-align: middle;
 }
 
 .notif-header {
