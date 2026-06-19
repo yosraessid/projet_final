@@ -15,7 +15,7 @@
  *   - L'icône SVG a aria-hidden="true".
  */
 
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNotifications } from '../context/NotificationsContext'
 import { useClickOutside } from '../hooks/useClickOutside'
@@ -34,6 +34,16 @@ function NotificationBell() {
 
   // Ferme le panneau si on clique en dehors du conteneur.
   useClickOutside(containerRef, closePanel, open)
+
+  // Bloque le scroll de la page quand le panneau est ouvert.
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => { document.body.style.overflow = '' }
+  }, [open])
 
   return (
     <div className="notif" ref={containerRef}>

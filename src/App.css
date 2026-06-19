@@ -859,8 +859,8 @@ td {
 
 .notif-panel {
   position: fixed;
-  right: 1.5rem;
-  top: 72px;
+  right: calc((100vw - min(1280px, 96%)) / 2 + 4.5rem);
+  top: 110px;
   width: 380px;
   max-height: calc(100vh - 90px);
   display: flex;
@@ -1643,3 +1643,43 @@ td {
 .member-avatar:nth-child(2) { background: linear-gradient(135deg, #4f46e5, #6366f1); }
 .member-avatar:nth-child(3) { background: linear-gradient(135deg, #0891b2, #06b6d4); }
 .member-avatar:nth-child(4) { background: linear-gradient(135deg, #db2777, #ec4899); }
+
+/* ── Header notifications — titre à gauche, X à droite alignés ── */
+.notif-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem 0.7rem;
+  border-bottom: 1px solid var(--divider, var(--shell-border));
+  flex-shrink: 0;
+  background: var(--notif-bg);
+}
+
+.notif-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.notif-header-left p {
+  margin: 0;
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--text-heading);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.notif-header .notif-panel-close {
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+  font-size: 1.4rem;
+  line-height: 1;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+}
