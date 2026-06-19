@@ -131,6 +131,8 @@ body {
   margin: 0;
   font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
   background: var(--page-bg);
+  background-attachment: fixed;
+  min-height: 100vh;
   color: var(--text-primary);
   transition: background 0.25s ease, color 0.25s ease;
 }
