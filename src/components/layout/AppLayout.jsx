@@ -30,7 +30,6 @@ import { useTheme } from '../../context/ThemeContext'
 const links = [
   { to: '/', label: 'Accueil' },
   { to: '/dashboard', label: 'Tableau de bord' },
-  { to: '/groupes', label: 'Équipes' },
   { to: '/profil', label: 'Paramètres' },
 ]
 
@@ -47,7 +46,6 @@ function AppLayout() {
     '/': 'Accueil',
     '/auth': 'Connexion',
     '/dashboard': 'Tableau de bord',
-    '/groupes': 'Mes équipes',
     '/profil': 'Paramètres',
   }
 
