@@ -16,6 +16,7 @@
  */
 
 import { useCallback, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useNotifications } from '../context/NotificationsContext'
 import { useClickOutside } from '../hooks/useClickOutside'
 
@@ -65,8 +66,8 @@ function NotificationBell() {
         {unreadCount > 0 && <span className="notif-badge">{unreadCount}</span>}
       </button>
 
-      {/* Panneau déroulant des notifications */}
-      {open && (
+      {/* Panneau déroulant des notifications — rendu via portal pour éviter les contraintes CSS */}
+      {open && createPortal(
         <div className="notif-panel" role="dialog" aria-label="Panneau notifications">
           {/* En-tête du panneau avec les actions */}
           <div className="notif-header">
@@ -80,7 +81,6 @@ function NotificationBell() {
               <button type="button" className="link-btn" onClick={clearAll}>
                 Effacer
               </button>
-              {/* Bouton × pour fermer le panneau */}
               <button
                 type="button"
                 className="notif-panel-close"
@@ -93,7 +93,6 @@ function NotificationBell() {
             </div>
           </div>
 
-          {/* Contenu : liste vide ou liste des notifications */}
           {items.length === 0 ? (
             <p className="notif-empty">Aucune notification pour le moment.</p>
           ) : (
@@ -104,14 +103,11 @@ function NotificationBell() {
                   className={n.read ? 'notif-item' : 'notif-item notif-item-unread'}
                 >
                   <div className="notif-item-top">
-                    {/* Badge de niveau (info/success/warning) */}
                     <span className={`pill pill-${n.level}`}>{n.title}</span>
                     <div className="notif-item-right">
-                      {/* Heure de création */}
                       <span className="muted">
                         {new Date(n.createdAt).toLocaleTimeString()}
                       </span>
-                      {/* Bouton × pour supprimer cette notification */}
                       <button
                         type="button"
                         className="notif-dismiss"
@@ -128,7 +124,8 @@ function NotificationBell() {
               ))}
             </ul>
           )}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )

@@ -858,18 +858,18 @@ td {
 }
 
 .notif-panel {
-  position: absolute;
-  right: 0;
-  top: 52px;
-  width: 340px;
-  max-height: 360px;
-  overflow: auto;
+  position: fixed;
+  right: 1.5rem;
+  top: 72px;
+  width: 360px;
+  max-height: calc(100vh - 90px);
+  overflow-y: auto;
   border-radius: 16px;
   border: 1px solid var(--notif-panel-border);
   background: var(--notif-bg);
-  box-shadow: var(--shell-shadow);
+  box-shadow: 0 8px 32px rgba(2,6,23,0.45);
   padding: 0.75rem;
-  z-index: 20;
+  z-index: 500;
 }
 
 .notif-header {
