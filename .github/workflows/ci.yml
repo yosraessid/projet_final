@@ -1,0 +1,67 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# Pipeline CI/CD — To-Do Liste Collaborative
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Ce workflow s'exécute automatiquement à chaque push et pull request sur main.
+#
+# Étapes :
+#   1. Installation des dépendances (npm ci)
+#   2. Vérification du code (ESLint)
+#   3. Exécution des tests unitaires (Vitest)
+#   4. Build de production (Vite)
+#
+# Si une étape échoue, le pipeline s'arrête et GitHub affiche ✗ sur le commit.
+# Si tout passe, GitHub affiche ✓ — le code est prêt pour la production.
+# ═══════════════════════════════════════════════════════════════════════════════
+
+name: CI — Tests & Build
+
+# Déclencheurs : push sur main + pull requests vers main
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── Job principal : lint, test, build ──────────────────────────────────────
+  ci:
+    name: Lint → Test → Build
+    runs-on: ubuntu-latest
+
+    # Variables d'environnement Firebase nécessaires pour les tests
+    env:
+      VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+      VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+      VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+      VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+      VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+      VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+
+    steps:
+      # 1. Récupère le code source du repository
+      - name: 📥 Checkout du code
+        uses: actions/checkout@v4
+
+      # 2. Configure Node.js (version LTS)
+      - name: 🟢 Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      # 3. Installe les dépendances (npm ci = install propre depuis le lockfile)
+      - name: 📦 Installation des dépendances
+        run: npm ci
+
+      # 4. Vérifie la qualité du code avec ESLint
+      - name: 🔍 Lint (ESLint)
+        run: npm run lint
+
+      # 5. Lance les 89 tests unitaires
+      - name: 🧪 Tests unitaires (Vitest)
+        run: npm run test
+
+      # 6. Build de production — vérifie que l'app compile sans erreur
+      - name: 🏗️ Build de production
+        run: npm run build
