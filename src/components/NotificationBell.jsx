@@ -18,7 +18,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNotifications } from '../context/NotificationsContext'
-import { useClickOutside } from '../hooks/useClickOutside'
 
 function NotificationBell() {
   const { items, unreadCount, markAllRead, clearAll, dismissOne } = useNotifications()
@@ -26,14 +25,31 @@ function NotificationBell() {
   // État d'ouverture/fermeture du panneau.
   const [open, setOpen] = useState(false)
 
-  // Référence sur le conteneur pour détecter les clics extérieurs.
+  // Référence sur le conteneur (bouton cloche) pour détecter les clics extérieurs.
   const containerRef = useRef(null)
+
+  // Référence sur le panneau (rendu via portal) pour l'inclure dans la zone de clic autorisée.
+  const panelRef = useRef(null)
 
   // Mémoïse closePanel pour éviter des re-renders dans useClickOutside.
   const closePanel = useCallback(() => setOpen(false), [])
 
-  // Ferme le panneau si on clique en dehors du conteneur.
-  useClickOutside(containerRef, closePanel, open)
+  // Ferme le panneau si on clique en dehors du conteneur ET du panneau.
+  useEffect(() => {
+    if (!open) return undefined
+
+    const handleClickOutside = (event) => {
+      // Ignore les clics dans le bouton cloche.
+      if (containerRef.current && containerRef.current.contains(event.target)) return
+      // Ignore les clics dans le panneau (rendu via portal).
+      if (panelRef.current && panelRef.current.contains(event.target)) return
+      // Clic en dehors → fermer.
+      closePanel()
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [open, closePanel])
 
   // Bloque le scroll de la page quand le panneau est ouvert.
   useEffect(() => {
@@ -77,7 +93,7 @@ function NotificationBell() {
       </button>
 
       {open && createPortal(
-        <div className="notif-panel" role="dialog" aria-label="Panneau notifications">
+        <div className="notif-panel" ref={panelRef} role="dialog" aria-label="Panneau notifications">
           {/* ── Header fixe ── */}
           <div className="notif-header">
             <p><span aria-hidden="true">🔔</span> Notifications {unreadCount > 0 && <span className="notif-header-count">{unreadCount}</span>}</p>
