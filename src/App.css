@@ -570,6 +570,8 @@ td {
 .kanban-item p {
   margin: 0;
   color: var(--text-heading);
+  word-break: break-word;
+  white-space: normal;
 }
 
 .kanban-item small {
@@ -1204,7 +1206,7 @@ td {
 .pdm-task-item { display:flex;align-items:center;justify-content:space-between;gap:0.5rem;padding:0.5rem 0.65rem;border-radius:10px;background:var(--btn-light-bg);border:1px solid var(--btn-light-border);transition:border-color 0.15s; }
 .pdm-task-item:hover { border-color:var(--input-focus); }
 .pdm-task-main { flex:1;min-width:0;display:flex;flex-direction:column;gap:0.25rem; }
-.pdm-task-title { flex:1;font-size:0.88rem;font-weight:500;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.pdm-task-title { flex:1;font-size:0.88rem;font-weight:500;color:var(--text-primary);word-break:break-word;white-space:normal; }
 .pdm-task-meta { display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap; }
 .pdm-task-actions { display:flex;align-items:center;gap:0.35rem;flex-shrink:0; }
 .pdm-task-delete { border:none;background:transparent;color:var(--text-muted);font-size:1.1rem;line-height:1;cursor:pointer;padding:0.2rem 0.4rem;border-radius:6px;transition:background 0.15s,color 0.15s; }
@@ -1401,7 +1403,7 @@ td {
 .pdm-task-item { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.65rem; border-radius: 10px; background: var(--btn-light-bg); border: 1px solid var(--btn-light-border); transition: border-color 0.15s; }
 .pdm-task-item:hover { border-color: var(--input-focus); }
 .pdm-task-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.25rem; }
-.pdm-task-title { flex: 1; font-size: 0.88rem; font-weight: 500; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pdm-task-title { flex: 1; font-size: 0.88rem; font-weight: 500; color: var(--text-primary); word-break: break-word; white-space: normal; }
 .pdm-task-meta { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
 .pdm-task-actions { display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0; }
 .pdm-task-delete { border: none; background: transparent; color: var(--text-muted); font-size: 1.1rem; line-height: 1; cursor: pointer; padding: 0.2rem 0.4rem; border-radius: 6px; transition: background 0.15s, color 0.15s; }
