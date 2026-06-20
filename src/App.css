@@ -2431,3 +2431,115 @@ td {
     padding: 0.22rem 0.4rem;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SKELETON LOADING — Placeholder animé pendant le chargement
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+@keyframes skeleton-pulse {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+.skeleton-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  overflow: hidden;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-bar {
+  height: 4px;
+  background: var(--btn-light-border);
+}
+
+.skeleton-body {
+  padding: 1rem 1.1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.skeleton-line {
+  border-radius: 6px;
+  background: var(--btn-light-border);
+}
+
+.skeleton-title {
+  height: 16px;
+  width: 70%;
+}
+
+.skeleton-desc {
+  height: 12px;
+  width: 100%;
+}
+
+.skeleton-desc-short {
+  height: 12px;
+  width: 55%;
+}
+
+.skeleton-row {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  margin-top: 0.2rem;
+}
+
+.skeleton-pill {
+  height: 18px;
+  width: 60px;
+  border-radius: 999px;
+  background: var(--btn-light-border);
+}
+
+.skeleton-progress {
+  height: 6px;
+  width: 100%;
+  border-radius: 999px;
+  background: var(--btn-light-border);
+  margin-top: 0.25rem;
+}
+
+.skeleton-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--btn-light-border);
+}
+
+.skeleton-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 1.1rem 0.85rem;
+  border-top: 1px solid var(--card-border);
+  margin-top: 0.5rem;
+}
+
+.skeleton-avatars {
+  display: flex;
+  gap: -4px;
+}
+
+.skeleton-avatars::before,
+.skeleton-avatars::after {
+  content: '';
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--btn-light-border);
+  margin-left: -7px;
+}
+
+.skeleton-avatars::before {
+  margin-left: 0;
+}
+
+.skeleton-members {
+  height: 12px;
+  width: 70px;
+}

@@ -522,10 +522,33 @@ function DashboardPage() {
       {/* ─── Grille des cartes projets ─── */}
       <div className="project-cards-grid">
         {dataLoading && projects.length === 0 ? (
-          <article className="project-card-v2-empty">
-            <span className="project-card-v2-empty-icon" aria-hidden="true">⏳</span>
-            <p>Chargement de vos projets...</p>
-          </article>
+          <>
+            {/* Skeleton loading — 3 cartes fantômes animées */}
+            {[1, 2, 3].map((i) => (
+              <article key={i} className="skeleton-card" aria-hidden="true">
+                <div className="skeleton-bar" />
+                <div className="skeleton-body">
+                  <div className="skeleton-line skeleton-title" />
+                  <div className="skeleton-line skeleton-desc" />
+                  <div className="skeleton-line skeleton-desc-short" />
+                  <div className="skeleton-row">
+                    <div className="skeleton-pill" />
+                    <div className="skeleton-pill" />
+                  </div>
+                  <div className="skeleton-progress" />
+                  <div className="skeleton-row">
+                    <div className="skeleton-dot" />
+                    <div className="skeleton-dot" />
+                    <div className="skeleton-dot" />
+                  </div>
+                </div>
+                <div className="skeleton-footer">
+                  <div className="skeleton-avatars" />
+                  <div className="skeleton-line skeleton-members" />
+                </div>
+              </article>
+            ))}
+          </>
         ) : filteredProjects.length === 0 ? (
           <article className="project-card-v2-empty">
             <span className="project-card-v2-empty-icon" aria-hidden="true">
