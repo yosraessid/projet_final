@@ -31,7 +31,7 @@ import { useTheme } from '../../context/ThemeContext'
 /** Liens de navigation affichés dans la sidebar. */
 const links = [
   { to: '/', label: 'Accueil', icon: Home },
-  { to: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
+  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/profil', label: 'Paramètres', icon: Settings },
 ]
 
@@ -47,7 +47,7 @@ function AppLayout() {
   const titleByPath = {
     '/': 'Accueil',
     '/auth': 'Connexion',
-    '/dashboard': 'Tableau de bord',
+    '/dashboard': 'Dashboard',
     '/profil': 'Paramètres',
   }
 
