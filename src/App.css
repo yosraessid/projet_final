@@ -110,6 +110,17 @@
   background: var(--badge-text);
 }
 
+.menu-icon {
+  flex-shrink: 0;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.menu-link-active .menu-icon {
+  opacity: 1;
+  color: var(--accent);
+}
+
 .menu-link:hover {
   border-color: var(--menu-hover-border);
   background: var(--menu-hover-bg);

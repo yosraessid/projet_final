@@ -20,7 +20,9 @@
  * Les actions en haut à droite : bouton thème, cloche de notifications, bouton auth.
  */
 
+import { useCallback, useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { Home, LayoutDashboard, Settings } from 'lucide-react'
 import logoWorkspace from '../../assets/logo-workspace.svg'
 import NotificationBell from '../NotificationBell'
 import TopbarAuth from '../TopbarAuth'
@@ -28,9 +30,9 @@ import { useTheme } from '../../context/ThemeContext'
 
 /** Liens de navigation affichés dans la sidebar. */
 const links = [
-  { to: '/', label: 'Accueil' },
-  { to: '/dashboard', label: 'Tableau de bord' },
-  { to: '/profil', label: 'Paramètres' },
+  { to: '/', label: 'Accueil', icon: Home },
+  { to: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
+  { to: '/profil', label: 'Paramètres', icon: Settings },
 ]
 
 /**
@@ -72,7 +74,7 @@ function AppLayout() {
               to={link.to}
               className={({ isActive }) => (isActive ? 'menu-link menu-link-active' : 'menu-link')}
             >
-              <span className="menu-dot" />
+              <link.icon size={18} className="menu-icon" aria-hidden="true" />
               {link.label}
             </NavLink>
           ))}
