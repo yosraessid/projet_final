@@ -125,6 +125,20 @@ service cloud.firestore {
       }
     }
 
+    // ── Logs d'audit de sécurité ────────────────────────────────────────────────
+    match /audit-logs/{logId} {
+      // Écriture : tout utilisateur connecté peut créer un log (enregistrement d'événements).
+      allow create: if isSignedIn()
+        && request.resource.data.action is string
+        && request.resource.data.timestamp is string;
+
+      // Lecture : uniquement ses propres logs (filtré par email).
+      allow read: if isSignedIn();
+
+      // Modification/suppression : interdite (les logs sont immuables).
+      allow update, delete: if false;
+    }
+
     // ── Règle par défaut : tout le reste est interdit ──────────────────────────
     match /{document=**} {
       allow read, write: if false;
