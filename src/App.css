@@ -2543,3 +2543,101 @@ td {
   height: 12px;
   width: 70px;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   PAGE 404 — Design moderne avec illustration
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.not-found-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem 1rem;
+  min-height: 60vh;
+  gap: 0.5rem;
+}
+
+.not-found-illustration {
+  animation: float 4s ease-in-out infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
+
+.not-found-astronaut {
+  animation: float 5s ease-in-out infinite;
+}
+
+.not-found-star {
+  animation: twinkle 2s ease-in-out infinite alternate;
+}
+
+.not-found-star:nth-child(2) { animation-delay: 0.3s; }
+.not-found-star:nth-child(3) { animation-delay: 0.7s; }
+.not-found-star:nth-child(4) { animation-delay: 1.1s; }
+.not-found-star:nth-child(5) { animation-delay: 1.5s; }
+.not-found-star:nth-child(6) { animation-delay: 0.5s; }
+
+@keyframes twinkle {
+  0%   { opacity: 0.3; transform: scale(0.8); }
+  100% { opacity: 1;   transform: scale(1.2); }
+}
+
+.not-found-code {
+  margin: 0;
+  font-size: 5rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, #7c3aed, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+
+.not-found-title {
+  margin: 0.25rem 0 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-heading);
+}
+
+.not-found-desc {
+  margin: 0.5rem 0 0;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  max-width: 400px;
+}
+
+.not-found-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@media (max-width: 640px) {
+  .not-found-code {
+    font-size: 3.5rem;
+  }
+
+  .not-found-title {
+    font-size: 1.2rem;
+  }
+
+  .not-found-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .not-found-actions .button {
+    width: 100%;
+  }
+}
