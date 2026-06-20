@@ -97,7 +97,7 @@
   border-radius: 10px;
   padding: 0.55rem 0.75rem;
   font-size: 1rem;
-  transition: all 0.2s ease;
+  transition: all 0.2s ease, transform 0.15s ease;
   display: flex;
   align-items: center;
   gap: 0.55rem;
@@ -124,12 +124,14 @@
 .menu-link:hover {
   border-color: var(--menu-hover-border);
   background: var(--menu-hover-bg);
+  transform: translateX(3px);
 }
 
 .menu-link-active {
   background: var(--menu-active-bg);
   color: var(--text-heading);
   border-color: var(--menu-active-border);
+  transform: translateX(3px);
 }
 
 .page-container {
@@ -204,6 +206,21 @@
   cursor: pointer;
   text-decoration: none;
   text-align: center;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+}
+
+.button:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .button-primary {
@@ -212,16 +229,31 @@
   box-shadow: 0 10px 18px rgba(124, 58, 237, 0.35);
 }
 
+.button-primary:hover {
+  box-shadow: 0 14px 24px rgba(124, 58, 237, 0.45);
+  filter: brightness(1.05);
+}
+
 .button-light {
   color: var(--btn-light-text);
   background: var(--btn-light-bg);
   border: 1px solid var(--btn-light-border);
 }
 
+.button-light:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.1);
+}
+
 .button-danger {
   color: #fff;
   background: linear-gradient(135deg, #dc2626, #be123c);
   border: 1px solid #ef4444;
+}
+
+.button-danger:hover {
+  box-shadow: 0 10px 20px rgba(220, 38, 38, 0.35);
+  filter: brightness(1.05);
 }
 
 .full-width {
@@ -267,7 +299,7 @@
   color: var(--text-primary);
   width: 100%;
   min-width: 0;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.25s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.25s ease, transform 0.15s ease;
 }
 
 /* Prevent horizontal scrollbars in long text inputs (not date fields) */
@@ -347,6 +379,7 @@
   outline: none;
   border-color: var(--input-focus);
   box-shadow: 0 0 0 3px var(--input-focus-ring);
+  transform: scale(1.01);
 }
 
 .password-input-wrap {
@@ -1147,6 +1180,7 @@ td {
 /* ── Cartes projet v2 ── */
 .project-card-v2 { position: relative; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; box-shadow: var(--card-shadow); cursor: pointer; display: flex; flex-direction: column; overflow: hidden; transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; }
 .project-card-v2:hover { transform: translateY(-3px); box-shadow: 0 16px 32px rgba(124,58,237,0.18); border-color: var(--input-focus); }
+.project-card-v2:active { transform: translateY(-1px) scale(0.98); }
 .project-card-v2-bar { height: 4px; background: linear-gradient(90deg,#7c3aed,#4f46e5,#06b6d4); flex-shrink: 0; }
 .project-card-v2-body { padding: 1rem 1.1rem 0.75rem; flex: 1; display: flex; flex-direction: column; gap: 0.4rem; }
 .project-card-v2-title { margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-heading); line-height: 1.3; }
