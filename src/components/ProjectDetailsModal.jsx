@@ -208,7 +208,7 @@ function ProjectDetailsModal({
           <div className="pdm-header-bar" aria-hidden="true" />
           <div className="pdm-header-content">
             <div>
-              <p className="pdm-header-label">Détails du projet</p>
+              <h2 className="pdm-header-title">Détails du projet</h2>
             </div>
             <button type="button" className="pdm-close" onClick={onClose} disabled={isSubmitting} aria-label="Fermer">×</button>
           </div>
