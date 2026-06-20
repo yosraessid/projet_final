@@ -1,189 +1,258 @@
-# WorkSpace — To-Do Liste Collaborative
+# 📋 To-Do Liste Collaborative
 
-Application web de gestion de tâches en équipe, développée dans le cadre d'un Projet de Fin d'Études (PFE) — 3ème année Développement Web.
+Application web de gestion collaborative de tâches en temps réel, développée avec React 19 et Firebase.
 
-Construite avec **React 19 + Vite**, **Firebase** (Auth + Firestore) et conteneurisée avec **Docker**.
-
----
-
-## Fonctionnalités
-
-- **Authentification** : inscription, connexion, réinitialisation de mot de passe (Firebase Auth)
-- **Projets collaboratifs** : création, édition, suppression avec confirmation
-- **Membres** : ajout par nom ou email, invitations en attente, retrait
-- **Tâches** : création, modification inline, changement de statut, priorité et assignation
-- **Statuts colorés** : À faire (rouge) · En cours (jaune) · Terminé (vert)
-- **Priorités distinctes** : Haute (rose) · Moyenne (bleu) · Basse (cyan)
-- **Synchronisation temps réel** : Firestore `onSnapshot`
-- **Thème clair / sombre** : persisté dans localStorage
-- **Notifications in-app** : panneau scrollable avec historique persisté
-- **Sécurité** : règles Firestore, rate limiting, validation emails
-- **Tests unitaires** : 89 tests (Vitest + Testing Library)
-- **Interface responsive** : adaptée mobile et desktop
+> **Projet de Fin d'Études (PFE)** — 3ème année Développement Web
 
 ---
 
-## Stack technique
+## 🎯 Problématique
 
-| Couche | Technologie |
-|--------|-------------|
-| Frontend | React 19, Vite |
-| Routing | React Router v6 |
-| Backend / BDD | Firebase Auth + Cloud Firestore |
-| Styles | CSS custom (variables CSS, sans framework) |
-| Tests | Vitest + @testing-library/react |
-| Conteneurisation | Docker + Nginx |
+Comment faciliter la gestion de tâches en équipe avec une application web moderne, sécurisée et accessible sur tous les appareils ?
 
 ---
 
-## Prérequis
+## ✨ Fonctionnalités
 
-- [Node.js](https://nodejs.org/) >= 18
-- Un projet Firebase avec Auth et Firestore activés
-- [Docker](https://www.docker.com/) (optionnel)
+| Fonctionnalité | Description |
+|---|---|
+| 🔐 Authentification | Inscription, connexion, mot de passe oublié (Firebase Auth) |
+| 📂 Gestion de projets | Créer, modifier, supprimer des projets collaboratifs |
+| ✅ Gestion de tâches | CRUD complet avec statut, priorité et assignation |
+| 👥 Gestion des membres | Ajout par email, rôles (Admin/Membre), invitations en attente |
+| 🔔 Notifications | Système de notifications persistantes in-app |
+| 🌓 Thème clair/sombre | Bascule dynamique avec persistance localStorage |
+| 📱 Responsive | Desktop, tablette, téléphone (4 breakpoints) |
+| ⚡ Temps réel | Synchronisation instantanée via Firestore listeners |
+| 🔒 Sécurité | Rate limiting, validation MDP, sanitisation XSS, audit Firestore |
+| 🧪 Tests | 89 tests unitaires automatisés (Vitest) |
+| 🚀 CI/CD | Pipeline GitHub Actions (lint, tests, build) |
 
 ---
 
-## Installation et configuration
+## 🏗️ Architecture
 
-### 1. Cloner le projet
-
-```bash
-git clone git@github.com:yosraessid/projet_final.git
-cd projet_final
 ```
-
-### 2. Configurer Firebase
-
-1. Créer un projet sur [Firebase Console](https://console.firebase.google.com/)
-2. Activer **Authentication → Email/Password**
-3. Activer **Cloud Firestore**
-4. Copier les clés depuis Paramètres → Config
-
-### 3. Créer le fichier d'environnement
-
-```bash
-cp .env.example .env
-```
-
-Remplir `.env` :
-
-```env
-VITE_FIREBASE_API_KEY=...
-VITE_FIREBASE_AUTH_DOMAIN=...
-VITE_FIREBASE_PROJECT_ID=...
-VITE_FIREBASE_STORAGE_BUCKET=...
-VITE_FIREBASE_MESSAGING_SENDER_ID=...
-VITE_FIREBASE_APP_ID=...
-```
-
-### 4. Installer et lancer
-
-```bash
-npm install
-npm run dev
-```
-
-Ouvrir : [http://localhost:5173](http://localhost:5173)
-
----
-
-## Lancer les tests
-
-```bash
-npm run test
-```
-
-89 tests unitaires couvrant : validation mot de passe, config Firebase, contexte notifications, composants UI.
-
----
-
-## Déploiement Docker
-
-```bash
-# Production
-docker compose up --build -d
-# → http://localhost:8080
-
-# Développement (hot reload)
-docker compose -f docker-compose.dev.yml up --build
-# → http://localhost:5173
+┌─────────────────────────────────────────────────────────────┐
+│                        CLIENT (React 19)                     │
+├─────────────────────────────────────────────────────────────┤
+│  Composants       │  Contextes        │  Services           │
+│  ├─ AppLayout     │  ├─ AuthContext   │  ├─ firebaseAuth    │
+│  ├─ Dashboard     │  ├─ AppData      │  ├─ firebaseAppData │
+│  ├─ ProjectModal  │  ├─ Notifications│  └─ securityLogger  │
+│  ├─ TaskStatus    │  └─ Theme        │                     │
+│  └─ NotifBell     │                   │                     │
+├─────────────────────────────────────────────────────────────┤
+│                     Firebase SDK (v12)                       │
+├─────────────────────────────────────────────────────────────┤
+│              BACKEND (Firebase — BaaS)                       │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
+│  │ Firebase    │  │ Cloud       │  │ Firestore Security  │ │
+│  │ Auth (JWT)  │  │ Firestore   │  │ Rules (validation)  │ │
+│  └─────────────┘  └─────────────┘  └─────────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Déployer les règles Firestore
+## 🛡️ Sécurité
 
-```bash
-npm install -g firebase-tools
-firebase login
-firebase use --add
-firebase deploy --only firestore:rules
-```
-
-Ou copier `firestore.rules` dans **Firebase Console → Firestore → Règles → Publier**.
+| Couche | Mesure | Détail |
+|--------|--------|--------|
+| Client | Validation mot de passe | 5 règles (8-16 chars, majuscule, minuscule, chiffre, spécial) |
+| Client | Rate limiting | 5 tentatives/min (login), 3/5min (inscription), 3/10min (reset) |
+| Client | Sanitisation XSS | Nettoyage des entrées, détection d'injection de scripts |
+| Client | Validation email | Regex stricte avant appel Firebase |
+| Serveur | Firestore Security Rules | Validation types, longueurs max, whitelist statuts, appartenance |
+| Serveur | Audit Firestore | Collection `audit-logs` — trace connexions réussies/échouées |
+| Serveur | Token JWT | Géré automatiquement par Firebase Auth (session persistante) |
 
 ---
 
-## Structure du projet
+## 🧰 Stack technique
+
+| Technologie | Version | Rôle |
+|---|---|---|
+| React | 19.2 | Framework frontend (SPA) |
+| Vite | 8.0 | Bundler et serveur de développement |
+| Firebase Auth | 12.14 | Authentification (email/mot de passe) |
+| Cloud Firestore | 12.14 | Base de données temps réel |
+| Vitest | 4.1 | Tests unitaires |
+| Testing Library | 16.3 | Tests de composants React |
+| ESLint | 10.3 | Qualité de code |
+| Docker | — | Conteneurisation |
+| GitHub Actions | — | CI/CD automatisé |
+
+---
+
+## 📁 Structure du projet
 
 ```
 src/
-├── components/
-│   ├── auth/              # ProtectedRoute
-│   ├── layout/            # AppLayout (sidebar + topbar)
-│   ├── NewProjectModal.jsx
-│   ├── ProjectDetailsModal.jsx  # Modal 2 colonnes
+├── components/          # Composants réutilisables
+│   ├── layout/          # AppLayout (sidebar + topbar)
+│   ├── auth/            # ProtectedRoute
 │   ├── NotificationBell.jsx
+│   ├── ProjectDetailsModal.jsx
 │   ├── TaskStatusMenu.jsx
-│   ├── TopbarAuth.jsx
-│   ├── PasswordInput.jsx
-│   └── PasswordRequirements.jsx
-├── context/
+│   └── ...
+├── context/             # Contextes React (état global)
 │   ├── AuthContext.jsx
 │   ├── AppDataContext.jsx
 │   ├── NotificationsContext.jsx
 │   └── ThemeContext.jsx
-├── firebase/
+├── services/            # Couche d'accès à Firebase
+│   ├── firebaseAuthService.js
+│   └── firebaseAppDataService.js
+├── firebase/            # Configuration Firebase
 │   ├── firebaseConfig.js
 │   └── firebaseClient.js
-├── hooks/
+├── utils/               # Utilitaires
+│   ├── passwordValidation.js
+│   ├── rateLimiter.js
+│   ├── sanitize.js
+│   └── securityLogger.js
+├── hooks/               # Hooks personnalisés
 │   └── useClickOutside.js
-├── pages/
+├── pages/               # Pages de l'application
 │   ├── HomePage.jsx
 │   ├── AuthPage.jsx
 │   ├── DashboardPage.jsx
+│   ├── ProjectPage.jsx
 │   ├── ProfileSettingsPage.jsx
 │   └── NotFoundPage.jsx
-├── services/
-│   ├── firebaseAuthService.js
-│   └── firebaseAppDataService.js
-├── tests/               # 89 tests unitaires
-└── utils/
-    ├── passwordValidation.js
-    └── rateLimiter.js
+├── tests/               # Tests unitaires (89 tests)
+├── App.jsx              # Routes de l'application
+├── App.css              # Styles globaux + responsive
+├── index.css            # Variables CSS (thème clair/sombre)
+└── main.jsx             # Point d'entrée
 ```
 
 ---
 
-## Structure Firestore
+## 🚀 Installation
 
+### Prérequis
+
+- Node.js 18+ et npm
+- Un projet Firebase avec Auth et Firestore activés
+
+### Étapes
+
+```bash
+# 1. Cloner le projet
+git clone git@github.com:yosraessid/projet_final.git
+cd projet_final
+
+# 2. Installer les dépendances
+npm install
+
+# 3. Configurer Firebase
+cp .env.example .env
+# Remplir les variables avec vos clés Firebase
+
+# 4. Publier les règles Firestore
+# Copier le contenu de firestore.rules dans Firebase Console > Firestore > Règles
+
+# 5. Lancer le serveur de développement
+npm run dev
 ```
-users/{uid}
-  └── uid, name, email, role, updatedAt
 
-projects/{projectId}
-  ├── id, name, description, deadline, createdAt
-  ├── memberUids[], pendingEmails[], memberRoles{}
-  └── tasks/{taskId}
-        ├── id, title, description, status
-        ├── priority, assigneeUid, deadline
-        └── createdAt
+### Avec Docker
+
+```bash
+docker-compose -f docker-compose.dev.yml up
 ```
 
 ---
 
-## Auteur
+## 🧪 Tests
 
-**Yosra Essid** — Projet de Fin d'Études 2026  
-[github.com/yosraessid/projet_final](https://github.com/yosraessid/projet_final)
+```bash
+# Lancer les 89 tests unitaires
+npm run test
+
+# Mode watch (développement)
+npm run test:watch
+```
+
+**Couverture :**
+- Composants : PasswordInput, PasswordRequirements, TaskStatusMenu, ProtectedRoute
+- Contextes : NotificationsContext
+- Utilitaires : passwordValidation, firebaseConfig
+
+---
+
+## 📜 Scripts disponibles
+
+| Commande | Description |
+|---|---|
+| `npm run dev` | Serveur de développement (port 5173) |
+| `npm run build` | Build de production |
+| `npm run test` | Lance les tests unitaires |
+| `npm run lint` | Vérifie la qualité du code |
+| `npm run preview` | Prévisualise le build de production |
+
+---
+
+## 🔄 CI/CD
+
+Le pipeline GitHub Actions s'exécute à chaque push sur `main` :
+
+1. ✅ **Lint** — Vérifie le code avec ESLint
+2. ✅ **Tests** — Lance les 89 tests unitaires
+3. ✅ **Build** — Compile l'application pour la production
+
+---
+
+## 📊 Collections Firestore
+
+| Collection | Description |
+|---|---|
+| `users` | Profils utilisateurs (uid, name, email, role) |
+| `projects` | Projets (name, description, memberUids, deadline) |
+| `projects/{id}/tasks` | Tâches d'un projet (title, status, priority, assigneeUid) |
+| `audit-logs` | Logs de sécurité (action, timestamp, email, userAgent) |
+
+---
+
+## 🎨 Thèmes
+
+L'application supporte deux thèmes avec transition fluide :
+
+- **Mode sombre** (par défaut) — gradient violet/cyan
+- **Mode clair** — fond clair avec accents indigo
+
+---
+
+## 📱 Responsive Design
+
+| Breakpoint | Appareil | Adaptation |
+|---|---|---|
+| > 900px | Desktop | Layout 2 colonnes (sidebar + contenu) |
+| 641–900px | Tablette | Sidebar horizontale, grilles adaptées |
+| ≤ 640px | Téléphone | Tout en colonne, panels plein écran |
+| ≤ 380px | Petit écran | Tailles réduites, tagline masquée |
+
+---
+
+## 🔮 Perspectives d'évolution
+
+- Firebase Cloud Functions (logique serveur avancée)
+- Drag & drop des tâches entre colonnes
+- Statistiques visuelles (graphiques de progression)
+- Notifications push (Firebase Cloud Messaging)
+- Déploiement production (Firebase Hosting)
+- Tests E2E (Cypress / Playwright)
+
+---
+
+## 👤 Auteur
+
+**Yosra Essid** — 3ème année Développement Web
+
+---
+
+## 📄 Licence
+
+Projet universitaire — PFE 2025/2026
