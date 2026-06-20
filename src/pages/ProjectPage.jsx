@@ -302,7 +302,20 @@ function ProjectPage() {
                       </div>
                     </div>
                     <div className="pdm-task-actions">
-                      <TaskStatusMenu status={t.status || 'A faire'} onChange={(next) => handleTaskStatus(t, next)} compact />
+                      <select
+                        className={`pdm-status-select ${
+                          (t.status || 'A faire') === 'Terminee' ? 'status-select-done' :
+                          (t.status || 'A faire') === 'En cours' ? 'status-select-progress' :
+                          'status-select-todo'
+                        }`}
+                        value={t.status || 'A faire'}
+                        onChange={(e) => handleTaskStatus(t, e.target.value)}
+                        aria-label="Statut"
+                      >
+                        <option value="A faire">À faire</option>
+                        <option value="En cours">En cours</option>
+                        <option value="Terminee">Terminé</option>
+                      </select>
                       {editingTaskId === t.id ? (
                         <button type="button" className="pdm-task-edit-confirm" onClick={() => confirmEditTask(t)}>✓</button>
                       ) : (

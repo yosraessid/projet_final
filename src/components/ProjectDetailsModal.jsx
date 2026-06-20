@@ -323,7 +323,21 @@ function ProjectDetailsModal({
                         </div>
                       </div>
                       <div className="pdm-task-actions">
-                        <TaskStatusMenu status={t.status || 'A faire'} onChange={(next) => handleTaskStatusChange(t, next)} disabled={isSubmitting || editingTaskId === t.id} compact />
+                        <select
+                          className={`pdm-status-select ${
+                            (t.status || 'A faire') === 'Terminee' ? 'status-select-done' :
+                            (t.status || 'A faire') === 'En cours' ? 'status-select-progress' :
+                            'status-select-todo'
+                          }`}
+                          value={t.status || 'A faire'}
+                          onChange={(e) => handleTaskStatusChange(t, e.target.value)}
+                          disabled={isSubmitting || editingTaskId === t.id}
+                          aria-label="Statut"
+                        >
+                          <option value="A faire">À faire</option>
+                          <option value="En cours">En cours</option>
+                          <option value="Terminee">Terminé</option>
+                        </select>
                         {editingTaskId === t.id ? (
                           <button type="button" className="pdm-task-edit-confirm" onClick={() => confirmEditTask(t)} title="Valider" aria-label="Valider">✓</button>
                         ) : (
