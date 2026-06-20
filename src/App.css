@@ -2697,3 +2697,17 @@ td {
 [data-theme='light'] .pdm-status-select.status-select-todo     { color: #dc2626; }
 [data-theme='light'] .pdm-status-select.status-select-progress { color: #ca8a04; }
 [data-theme='light'] .pdm-status-select.status-select-done     { color: #16a34a; }
+
+/* Options colorées dans le select statut */
+.pdm-status-select option[value='A faire'] { color: #ef4444; background: var(--input-bg); }
+.pdm-status-select option[value='En cours'] { color: #eab308; background: var(--input-bg); }
+.pdm-status-select option[value='Terminee'] { color: #22c55e; background: var(--input-bg); }
+
+/* Couleur dynamique du select selon la valeur sélectionnée */
+.pdm-status-select:has(option[value='A faire']:checked)  { color: #f87171; border-color: rgba(239,68,68,0.45);  background-color: rgba(239,68,68,0.1); }
+.pdm-status-select:has(option[value='En cours']:checked) { color: #facc15; border-color: rgba(234,179,8,0.45);  background-color: rgba(234,179,8,0.1); }
+.pdm-status-select:has(option[value='Terminee']:checked) { color: #86efac; border-color: rgba(34,197,94,0.45);  background-color: rgba(34,197,94,0.1); }
+
+[data-theme='light'] .pdm-status-select:has(option[value='A faire']:checked)  { color: #dc2626; }
+[data-theme='light'] .pdm-status-select:has(option[value='En cours']:checked) { color: #ca8a04; }
+[data-theme='light'] .pdm-status-select:has(option[value='Terminee']:checked) { color: #16a34a; }
