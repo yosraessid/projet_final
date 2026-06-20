@@ -283,7 +283,6 @@ function ProjectPage() {
             <h3 className="pdm-section-title"><span className="pdm-section-icon">✅</span> Tâches ({projectTasks.length})</h3>
             <div className="pdm-task-list project-page-task-list">
               {projectTasks.length === 0 ? <p className="pdm-empty">Aucune tâche.</p> : projectTasks.map((t) => {
-                const assigneeName = t.assigneeId ? members.find((m) => m.id === t.assigneeId)?.name : null
                 return (
                   <div key={t.id} className="pdm-task-item">
                     <div className="pdm-task-main">
