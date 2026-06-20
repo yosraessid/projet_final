@@ -1132,6 +1132,12 @@ td {
   padding: 1rem;
   background: rgba(15, 23, 42, 0.45);
   backdrop-filter: blur(4px);
+  animation: modal-backdrop-in 0.2s ease;
+}
+
+@keyframes modal-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /* ── Modal création projet ── */
@@ -1144,6 +1150,12 @@ td {
   border-radius: 16px;
   box-shadow: 0 24px 48px rgba(15, 23, 42, 0.2);
   padding: 1.25rem 1.35rem 1.35rem;
+  animation: modal-card-in 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modal-card-in {
+  from { opacity: 0; transform: scale(0.92) translateY(10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 .modal-card-wide { width: min(640px, 100%); }
 .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
@@ -1156,8 +1168,8 @@ td {
 .modal-footer-actions { display: flex; gap: 0.6rem; }
 
 /* ── Confirmation dialog ── */
-.confirm-overlay { position: fixed; inset: 0; z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 1rem; background: rgba(15,23,42,0.55); backdrop-filter: blur(4px); }
-.confirm-card { width: min(400px,100%); background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.75rem 1.5rem 1.5rem; box-shadow: 0 24px 48px rgba(15,23,42,0.35); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.5rem; }
+.confirm-overlay { position: fixed; inset: 0; z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 1rem; background: rgba(15,23,42,0.55); backdrop-filter: blur(4px); animation: modal-backdrop-in 0.15s ease; }
+.confirm-card { width: min(400px,100%); background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.75rem 1.5rem 1.5rem; box-shadow: 0 24px 48px rgba(15,23,42,0.35); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.5rem; animation: modal-card-in 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
 .confirm-icon { font-size: 2.2rem; line-height: 1; margin-bottom: 0.25rem; }
 .confirm-card h3 { margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-heading); }
 .confirm-detail { margin: 0; font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; }
@@ -1229,7 +1241,7 @@ td {
 .notif-dismiss:hover { opacity: 1; background: var(--btn-light-bg); color: var(--text-primary); }
 
 /* ── Modal détails projet (PDM) — 2 colonnes par-dessus le dashboard ── */
-.pdm-shell { width: min(860px,96vw); max-height: 92vh; display: flex; flex-direction: column; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; box-shadow: 0 32px 64px rgba(2,6,23,0.4); overflow: hidden; }
+.pdm-shell { width: min(860px,96vw); max-height: 92vh; display: flex; flex-direction: column; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; box-shadow: 0 32px 64px rgba(2,6,23,0.4); overflow: hidden; animation: modal-card-in 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
 .pdm-header { flex-shrink: 0; }
 .pdm-header-bar { height: 4px; background: linear-gradient(90deg,#7c3aed,#4f46e5,#06b6d4); }
 .pdm-header-content { display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 1.4rem 0.9rem; border-bottom: 1px solid var(--card-border); }
