@@ -20,7 +20,6 @@
  * Les actions en haut à droite : bouton thème, cloche de notifications, bouton auth.
  */
 
-import { useCallback, useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { Home, LayoutDashboard, Settings } from 'lucide-react'
 import logoWorkspace from '../../assets/logo-workspace.svg'

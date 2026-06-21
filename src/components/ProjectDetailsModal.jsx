@@ -4,7 +4,6 @@
  */
 
 import { useEffect, useMemo, useState } from 'react'
-import TaskStatusMenu from './TaskStatusMenu'
 
 const PRIORITY_OPTIONS = [
   { value: 'Haute',   label: 'Haute',   className: 'priority-high' },

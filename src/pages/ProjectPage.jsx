@@ -13,7 +13,6 @@ import { useAppData } from '../context/AppDataContext'
 import { useAuth } from '../context/AuthContext'
 import { useNotifications } from '../context/NotificationsContext'
 import { resolveMemberInput } from '../services/firebaseAppDataService'
-import TaskStatusMenu from '../components/TaskStatusMenu'
 
 const PRIORITY_OPTIONS = [
   { value: 'Haute',   label: 'Haute',   className: 'priority-high' },
