@@ -93,12 +93,12 @@ export function AuthProvider({ children }) {
       try {
         const profile = await getUserProfileByUid(fbUser.uid)
         if (profile?.name && profile?.email) {
-          setUser({ uid: fbUser.uid, name: profile.name, email: profile.email, role: profile.role || 'Membre' })
+          setUser({ uid: fbUser.uid, name: profile.name, email: profile.email, role: profile.role || 'Membre', theme: profile.theme || 'dark' })
         } else {
-          setUser({ uid: fbUser.uid, name: nameFromEmail(fbUser.email), email: fbUser.email, role: 'Membre' })
+          setUser({ uid: fbUser.uid, name: nameFromEmail(fbUser.email), email: fbUser.email, role: 'Membre', theme: 'dark' })
         }
       } catch {
-        setUser({ uid: fbUser.uid, name: nameFromEmail(fbUser.email), email: fbUser.email, role: 'Membre' })
+        setUser({ uid: fbUser.uid, name: nameFromEmail(fbUser.email), email: fbUser.email, role: 'Membre', theme: 'dark' })
       } finally {
         setLoading(false)
       }

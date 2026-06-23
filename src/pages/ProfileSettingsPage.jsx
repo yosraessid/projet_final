@@ -48,6 +48,7 @@ function ProfileSettingsPage() {
   const [email, setEmail] = useState('')
   const [role, setRole] = useState('Membre')
   const [saving, setSaving] = useState(false)
+  const [successMsg, setSuccessMsg] = useState('')
 
   // Synchronise les champs avec les données de l'utilisateur connecté.
   useEffect(() => {
@@ -72,22 +73,29 @@ function ProfileSettingsPage() {
     }
 
     setSaving(true)
-    const result = await saveProfile({ name: fullName, role })
-    setSaving(false)
-
-    if (!result.ok) {
-      notify('Erreur', result.message, 'warning')
-      return
+    try {
+      const result = await saveProfile({ name: fullName.trim(), role: role.trim() || 'Membre' })
+      if (!result.ok) {
+        notify('Erreur', result.message, 'warning')
+        return
+      }
+      notify('Profil', 'Profil mis à jour avec succès.', 'success')
+      setSuccessMsg('✓ Profil mis à jour avec succès !')
+      setTimeout(() => setSuccessMsg(''), 3000)
+    } catch (err) {
+      console.error('Erreur mise à jour profil:', err)
+      notify('Erreur', err?.message || 'Échec de la mise à jour.', 'warning')
+    } finally {
+      setSaving(false)
     }
-    notify('Profil', 'Profil mis à jour avec succès.', 'success')
   }
 
   /**
    * Déconnecte l'utilisateur et redirige vers la page d'accueil.
    */
   const handleLogout = async () => {
-    await logout()
     notify('Déconnexion', 'À bientôt !', 'info')
+    await logout()
     navigate('/')
   }
 
@@ -143,6 +151,12 @@ function ProfileSettingsPage() {
           >
             {saving ? 'Enregistrement...' : 'Mettre à jour'}
           </button>
+
+          {successMsg && (
+            <p className="success-msg" style={{ color: 'var(--accent)', marginTop: '0.75rem', textAlign: 'center', fontWeight: 500 }}>
+              {successMsg}
+            </p>
+          )}
         </form>
       </article>
 

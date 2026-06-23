@@ -86,9 +86,9 @@ function TopbarAuth() {
    * Déconnecte l'utilisateur et redirige vers l'accueil.
    */
   const handleLogout = async () => {
-    await logout()
-    setOpen(false)
     notify('Déconnexion', 'À bientôt !', 'info')
+    setOpen(false)
+    await logout()
     navigate('/')
   }
 

@@ -136,7 +136,7 @@ function mapProjectDoc(data) {
     pendingEmails: data.pendingEmails || [],
     memberRoles: data.memberRoles || {},
     // createdAt est un Timestamp Firestore — on le convertit en ISO string pour éviter
-    // les problèmes de sérialisation dans le cache localStorage.
+    // les problèmes de sérialisation.
     createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
   }
 }

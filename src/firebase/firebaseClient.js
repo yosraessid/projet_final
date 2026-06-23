@@ -7,7 +7,7 @@
  *   - getFirebaseDb()   : retourne l'instance Firestore (ou null si non configuré)
  *
  * Firebase n'est initialisé qu'une seule fois, au premier appel d'une de ces fonctions.
- * La persistance Auth (localStorage) et la persistance Firestore (IndexedDB) sont
+ * La persistance Auth et la persistance Firestore (IndexedDB) sont
  * activées automatiquement pour permettre le mode hors ligne.
  */
 

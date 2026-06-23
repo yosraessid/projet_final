@@ -2,7 +2,7 @@
  * ThemeContext.jsx
  * Contexte React pour la gestion du thème visuel (clair / sombre).
  *
- * Le thème est persisté dans localStorage sous la clé "app-theme".
+ * Le thème est persisté dans Firestore (champ "theme" du document utilisateur).
  * Par défaut, le thème sombre est appliqué si aucune préférence n'est sauvegardée.
  *
  * Valeurs exposées via useTheme() :
@@ -13,50 +13,73 @@
  *   - toggleTheme  : () => void — bascule entre clair et sombre
  *
  * Fonctions utilitaires exportées :
- *   - initTheme()  : à appeler avant le premier rendu pour éviter le flash de thème
+ *   - initTheme()  : à appeler avant le premier rendu pour appliquer le thème par défaut
  */
 
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-
-/** Clé utilisée pour sauvegarder la préférence de thème dans localStorage. */
-const STORAGE_KEY = 'app-theme'
+import { doc, setDoc } from 'firebase/firestore'
+import { getFirebaseDb, isFirebaseConfigured } from '../firebase/firebaseClient'
+import { useAuth } from './AuthContext'
 
 const ThemeContext = createContext(null)
 
 /**
- * Lit le thème sauvegardé dans localStorage.
- * Retourne 'light' si la valeur est explicitement 'light', 'dark' dans tous les autres cas.
- * @returns {'dark' | 'light'}
- */
-function getStoredTheme() {
-  const saved = localStorage.getItem(STORAGE_KEY)
-  return saved === 'light' ? 'light' : 'dark'
-}
-
-/**
- * Applique immédiatement le thème sauvegardé sur <html data-theme="...">.
- * À appeler avant createRoot() pour éviter le flash blanc/noir au chargement.
- * @returns {'dark' | 'light'} le thème appliqué.
+ * Applique le thème par défaut (sombre) sur <html data-theme="...">.
+ * À appeler avant createRoot() pour éviter le flash blanc au chargement.
+ * @returns {'dark'}
  */
 export function initTheme() {
-  const theme = getStoredTheme()
-  document.documentElement.setAttribute('data-theme', theme)
-  return theme
+  document.documentElement.setAttribute('data-theme', 'dark')
+  return 'dark'
 }
 
 /**
  * Provider du contexte de thème.
- * Enveloppe les composants enfants et leur donne accès aux valeurs et actions de thème.
+ * Lit la préférence de thème depuis le profil Firestore et la sauvegarde à chaque changement.
  */
 export function ThemeProvider({ children }) {
-  // Initialise le thème depuis localStorage (avec initTheme comme valeur initiale).
-  const [theme, setTheme] = useState(() => initTheme())
+  const { user } = useAuth()
 
-  // Synchronise l'attribut data-theme du <html> et sauvegarde dans localStorage à chaque changement.
+  // Initialise le thème (sombre par défaut).
+  const [theme, setThemeState] = useState('dark')
+
+  // Quand l'utilisateur se connecte et que son profil contient un thème, on l'applique.
+  useEffect(() => {
+    if (user?.theme) {
+      const t = user.theme === 'light' ? 'light' : 'dark'
+      setThemeState(t)
+      document.documentElement.setAttribute('data-theme', t)
+    }
+  }, [user?.theme])
+
+  // Réinitialise au thème sombre lors de la déconnexion.
+  useEffect(() => {
+    if (!user) {
+      setThemeState('dark')
+      document.documentElement.setAttribute('data-theme', 'dark')
+    }
+  }, [user])
+
+  // Synchronise l'attribut data-theme du <html> à chaque changement.
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
-    localStorage.setItem(STORAGE_KEY, theme)
   }, [theme])
+
+  /**
+   * Change le thème et le sauvegarde dans Firestore.
+   * @param {string} newTheme
+   */
+  const setTheme = (newTheme) => {
+    setThemeState(newTheme)
+    document.documentElement.setAttribute('data-theme', newTheme)
+    // Sauvegarde dans Firestore si l'utilisateur est connecté.
+    if (user?.uid && isFirebaseConfigured()) {
+      const db = getFirebaseDb()
+      if (db) {
+        setDoc(doc(db, 'users', user.uid), { theme: newTheme }, { merge: true }).catch(() => {})
+      }
+    }
+  }
 
   // Mémoïse la valeur du contexte pour éviter des re-renders inutiles des consommateurs.
   const value = useMemo(
@@ -67,9 +90,9 @@ export function ThemeProvider({ children }) {
       /** Active ou désactive le mode sombre selon le booléen fourni. */
       setDarkMode: (enabled) => setTheme(enabled ? 'dark' : 'light'),
       /** Bascule entre les deux thèmes. */
-      toggleTheme: () => setTheme((t) => (t === 'dark' ? 'light' : 'dark')),
+      toggleTheme: () => setTheme(theme === 'dark' ? 'light' : 'dark'),
     }),
-    [theme],
+    [theme, user?.uid],
   )
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>

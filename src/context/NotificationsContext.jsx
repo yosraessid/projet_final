@@ -3,10 +3,12 @@
  * Contexte React pour la gestion des notifications in-app (toasts / cloche).
  *
  * Fonctionnement :
- *   - Les notifications sont stockées dans localStorage pour survivre aux rechargements.
+ *   - Les notifications sont stockées dans Firestore (sous-collection users/{uid}/notifications).
+ *   - Écoute en temps réel via onSnapshot.
  *   - Tableau limité à 20 entrées (les plus récentes en premier).
  *   - Chaque notification possède : id, titre, message, niveau, état lu/non-lu, date de création.
  *   - Le compteur unreadCount est recalculé automatiquement.
+ *   - Les notifications sont réinitialisées à chaque déconnexion.
  *
  * Valeurs exposées via useNotifications() :
  *   - items        : tableau des notifications
@@ -19,53 +21,66 @@
  */
 
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import {
+  collection,
+  addDoc,
+  onSnapshot,
+  query,
+  orderBy,
+  limit,
+  writeBatch,
+  doc,
+  deleteDoc,
+  updateDoc,
+  serverTimestamp,
+} from 'firebase/firestore'
+import { getFirebaseDb, isFirebaseConfigured } from '../firebase/firebaseClient'
+import { useAuth } from './AuthContext'
 
 const NotificationsContext = createContext(null)
 
-/** Clé localStorage pour persister les notifications. */
-const STORAGE_KEY = 'app-notifications'
-
-/**
- * Lit les notifications sauvegardées dans localStorage.
- * Retourne un tableau vide si absent ou invalide.
- * @returns {object[]}
- */
-function readStoredNotifications() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return []
-    const parsed = JSON.parse(raw)
-    return Array.isArray(parsed) ? parsed : []
-  } catch {
-    return []
-  }
-}
-
-/**
- * Sauvegarde les notifications dans localStorage.
- * Ignore les erreurs de quota (navigation privée, stockage plein).
- * @param {object[]} items
- */
-function writeStoredNotifications(items) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
-  } catch {
-    // Quota dépassé ou navigation privée : on ignore silencieusement.
-  }
-}
-
 /**
  * Provider du contexte de notifications.
- * Initialise depuis localStorage et persiste chaque modification.
+ * Synchronise les notifications en temps réel depuis Firestore.
  */
 export function NotificationsProvider({ children }) {
-  // Initialise depuis localStorage pour restaurer les notifications après rechargement.
-  const [items, setItems] = useState(() => readStoredNotifications())
+  const { user, isLoggedIn } = useAuth()
 
-  // Persiste dans localStorage à chaque changement de la liste.
+  const [items, setItems] = useState([])
+
+  // Écoute en temps réel les notifications de l'utilisateur dans Firestore.
   useEffect(() => {
-    writeStoredNotifications(items)
-  }, [items])
+    if (!isLoggedIn || !user?.uid || !isFirebaseConfigured()) {
+      setItems([])
+      return undefined
+    }
+
+    const db = getFirebaseDb()
+    if (!db) {
+      setItems([])
+      return undefined
+    }
+
+    const notifRef = collection(db, 'users', user.uid, 'notifications')
+    const q = query(notifRef, orderBy('createdAt', 'desc'), limit(20))
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const notifications = snapshot.docs.map((docSnap) => ({
+          id: docSnap.id,
+          ...docSnap.data(),
+          createdAt: docSnap.data().createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+        }))
+        setItems(notifications)
+      },
+      () => {
+        // Erreur d'écoute (permissions, offline) — on garde l'état actuel.
+      },
+    )
+
+    return unsubscribe
+  }, [isLoggedIn, user?.uid])
 
   // Nombre de notifications non lues — recalculé uniquement quand items change.
   const unreadCount = useMemo(
@@ -74,44 +89,86 @@ export function NotificationsProvider({ children }) {
   )
 
   /**
-   * Ajoute une nouvelle notification à la liste.
-   * La liste est plafonnée à 20 entrées pour éviter les fuites mémoire.
-   * @param {string} title   - Titre court de la notification (ex: 'Projet', 'Erreur').
-   * @param {string} message - Message détaillé affiché dans la cloche.
+   * Ajoute une nouvelle notification dans Firestore.
+   * @param {string} title   - Titre court de la notification.
+   * @param {string} message - Message détaillé.
    * @param {string} level   - Niveau visuel : 'info' | 'success' | 'warning'.
    */
   const notify = (title, message, level = 'info') => {
-    const newItem = {
-      id: Date.now(),
+    if (!user?.uid || !isFirebaseConfigured()) return
+
+    const db = getFirebaseDb()
+    if (!db) return
+
+    const notifRef = collection(db, 'users', user.uid, 'notifications')
+    addDoc(notifRef, {
       title,
       message,
       level,
       read: false,
-      createdAt: new Date().toISOString(),
-    }
-    // Insère en tête de liste et limite à 20 éléments.
-    setItems((prev) => [newItem, ...prev].slice(0, 20))
+      createdAt: serverTimestamp(),
+    }).catch(() => {})
   }
 
   /**
    * Marque toutes les notifications comme lues (read: true).
-   * Met à jour le badge de la cloche à 0.
    */
-  const markAllRead = () => {
-    setItems((prev) => prev.map((n) => ({ ...n, read: true })))
+  const markAllRead = async () => {
+    if (!user?.uid || !isFirebaseConfigured()) return
+
+    const db = getFirebaseDb()
+    if (!db) return
+
+    const batch = writeBatch(db)
+    items.filter((n) => !n.read).forEach((n) => {
+      const ref = doc(db, 'users', user.uid, 'notifications', n.id)
+      batch.update(ref, { read: true })
+    })
+
+    try {
+      await batch.commit()
+    } catch {
+      // Erreur silencieuse.
+    }
   }
 
   /**
-   * Supprime toutes les notifications de la liste et du localStorage.
+   * Supprime toutes les notifications de Firestore.
    */
-  const clearAll = () => setItems([])
+  const clearAll = async () => {
+    if (!user?.uid || !isFirebaseConfigured()) return
+
+    const db = getFirebaseDb()
+    if (!db) return
+
+    const batch = writeBatch(db)
+    items.forEach((n) => {
+      const ref = doc(db, 'users', user.uid, 'notifications', n.id)
+      batch.delete(ref)
+    })
+
+    try {
+      await batch.commit()
+    } catch {
+      // Erreur silencieuse.
+    }
+  }
 
   /**
    * Supprime une seule notification par son id.
-   * @param {number} id
+   * @param {string} id
    */
-  const dismissOne = (id) => {
-    setItems((prev) => prev.filter((n) => n.id !== id))
+  const dismissOne = async (id) => {
+    if (!user?.uid || !isFirebaseConfigured()) return
+
+    const db = getFirebaseDb()
+    if (!db) return
+
+    try {
+      await deleteDoc(doc(db, 'users', user.uid, 'notifications', id))
+    } catch {
+      // Erreur silencieuse.
+    }
   }
 
   // Mémoïse la valeur du contexte pour éviter des re-renders inutiles.

@@ -68,6 +68,23 @@ service cloud.firestore {
 
       // Suppression : interdite (protection des données).
       allow delete: if false;
+
+      // ── Notifications de l'utilisateur ─────────────────────────────────────
+      match /notifications/{notifId} {
+        // Lecture : uniquement ses propres notifications.
+        allow read: if isOwner(userId);
+
+        // Création : uniquement dans ses propres notifications.
+        allow create: if isOwner(userId)
+          && request.resource.data.title is string
+          && request.resource.data.message is string;
+
+        // Mise à jour : uniquement ses propres notifications (marquer comme lu).
+        allow update: if isOwner(userId);
+
+        // Suppression : uniquement ses propres notifications.
+        allow delete: if isOwner(userId);
+      }
     }
 
     // ── Projets ────────────────────────────────────────────────────────────────

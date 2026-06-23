@@ -4,7 +4,7 @@
  * - Initialise le thème avant le rendu pour éviter le flash
  * - Vérifie si Firebase est configuré :
  *   - Si non : affiche un écran de configuration guidée (FirebaseSetupScreen)
- *   - Si oui  : monte l'arbre complet des providers (Theme, Auth, Notifications, AppData)
+ *   - Si oui  : monte l'arbre complet des providers (Auth, Theme, Notifications, AppData)
  *               puis rend le composant App avec le routeur
  */
 
@@ -20,7 +20,7 @@ import { ThemeProvider, initTheme } from './context/ThemeContext.jsx'
 import FirebaseSetupScreen from './components/FirebaseSetupScreen.jsx'
 import { isFirebaseConfigured } from './firebase/firebaseClient'
 
-// Applique le thème sauvegardé avant le premier rendu pour éviter le flash clair/sombre.
+// Applique le thème sombre par défaut avant le premier rendu pour éviter le flash.
 initTheme()
 
 // Cible le div#root défini dans index.html.
@@ -30,9 +30,7 @@ if (!isFirebaseConfigured()) {
   // Firebase non configuré : on affiche uniquement l'écran d'aide à la configuration.
   root.render(
     <StrictMode>
-      <ThemeProvider>
-        <FirebaseSetupScreen />
-      </ThemeProvider>
+      <FirebaseSetupScreen />
     </StrictMode>,
   )
 } else {
@@ -41,10 +39,10 @@ if (!isFirebaseConfigured()) {
     <StrictMode>
       {/* BrowserRouter active la navigation côté client */}
       <BrowserRouter>
-        {/* ThemeProvider gère le mode clair/sombre */}
-        <ThemeProvider>
-          {/* AuthProvider gère la session utilisateur Firebase */}
-          <AuthProvider>
+        {/* AuthProvider gère la session utilisateur Firebase */}
+        <AuthProvider>
+          {/* ThemeProvider gère le mode clair/sombre (dépend de AuthContext) */}
+          <ThemeProvider>
             {/* NotificationsProvider gère les messages toast */}
             <NotificationsProvider>
               {/* AppDataProvider synchronise projets/tâches/membres en temps réel */}
@@ -52,8 +50,8 @@ if (!isFirebaseConfigured()) {
                 <App />
               </AppDataProvider>
             </NotificationsProvider>
-          </AuthProvider>
-        </ThemeProvider>
+          </ThemeProvider>
+        </AuthProvider>
       </BrowserRouter>
     </StrictMode>,
   )

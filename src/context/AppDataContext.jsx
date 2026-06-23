@@ -4,7 +4,6 @@
  *
  * Responsabilités :
  *   - Écoute Firestore en temps réel (projets, membres, tâches) via subscribeToAppData.
- *   - Met en cache les données dans localStorage pour un affichage instantané au rechargement.
  *   - Expose les actions CRUD (créer, modifier, supprimer) pour les projets et les tâches.
  *
  * Valeurs exposées via useAppData() :
@@ -36,53 +35,6 @@ import {
 } from '../services/firebaseAppDataService'
 
 const AppDataContext = createContext(null)
-
-/** Préfixe des clés localStorage pour le cache des données par utilisateur. */
-const DATA_CACHE_PREFIX = 'workspace-app-data'
-
-/**
- * Lit le cache localStorage pour un utilisateur donné.
- * @param {string} uid
- * @returns {{ members, projects, tasks }|null} Données en cache ou null si absent/invalide.
- */
-function readCachedAppData(uid) {
-  if (!uid) return null
-  try {
-    const raw = localStorage.getItem(`${DATA_CACHE_PREFIX}:${uid}`)
-    if (!raw) return null
-    const parsed = JSON.parse(raw)
-    if (!parsed || !Array.isArray(parsed.projects)) return null
-    return {
-      members: parsed.members || [],
-      projects: parsed.projects || [],
-      tasks: parsed.tasks || [],
-    }
-  } catch {
-    return null
-  }
-}
-
-/**
- * Écrit les données dans le cache localStorage pour un utilisateur donné.
- * Les erreurs de quota ou de navigation privée sont silencieusement ignorées.
- * @param {string} uid
- * @param {{ members, projects, tasks }} data
- */
-function writeCachedAppData(uid, data) {
-  if (!uid) return
-  try {
-    localStorage.setItem(
-      `${DATA_CACHE_PREFIX}:${uid}`,
-      JSON.stringify({
-        members: data.members,
-        projects: data.projects,
-        tasks: data.tasks,
-      }),
-    )
-  } catch {
-    // Quota dépassé ou navigation privée : on ignore silencieusement.
-  }
-}
 
 /**
  * Provider du contexte de données applicatives.
@@ -130,20 +82,9 @@ export function AppDataProvider({ children }) {
       setLoading(true)
       setError(null)
 
-      // Affichage instantané : charge les données en cache avant même d'appeler Firestore.
-      // Le cache inclut les membres déjà connus → pas de flash vide au rechargement.
-      const cached = readCachedAppData(user.uid)
-      if (cached) {
-        setMembers(cached.members)
-        setProjects(cached.projects)
-        setTasks(cached.tasks)
-        setLoading(false) // On affiche immédiatement le cache, le loading s'arrête.
-      }
-
       if (!active) return
 
       // Démarre l'écoute Firestore en temps réel.
-      // Quand Firestore répond, les données fraîches remplacent le cache.
       unsubscribe = subscribeToAppData(
         user.uid,
         (data) => {
@@ -151,8 +92,6 @@ export function AppDataProvider({ children }) {
           setMembers(data.members)
           setProjects(data.projects)
           setTasks(data.tasks)
-          // Met à jour le cache avec les données fraîches de Firestore.
-          writeCachedAppData(user.uid, data)
           setError(null)
           setLoading(false)
         },
@@ -233,22 +172,14 @@ export function AppDataProvider({ children }) {
 
   /**
    * Supprime un projet et toutes ses tâches de Firestore.
-   * Met à jour l'état local et le cache immédiatement.
+   * Met à jour l'état local immédiatement.
    */
   const deleteProject = useCallback(async ({ projectId }) => {
     await deleteProjectInFirestore({ projectId })
     // Suppression optimiste de l'état local.
     setProjects((prev) => prev.filter((p) => p.id !== projectId))
     setTasks((prev) => prev.filter((t) => t.projectId !== projectId))
-    // Met à jour le cache sans le projet supprimé.
-    if (user?.uid) {
-      writeCachedAppData(user.uid, {
-        members,
-        projects: projects.filter((p) => p.id !== projectId),
-        tasks: tasks.filter((t) => t.projectId !== projectId),
-      })
-    }
-  }, [user?.uid, members, projects, tasks])
+  }, [user?.uid])
 
   // Mémoïse la valeur du contexte pour éviter des re-renders inutiles.
   const value = useMemo(
