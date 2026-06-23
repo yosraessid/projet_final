@@ -122,7 +122,7 @@ function ProfileSettingsPage() {
             Nom complet
             <input
               type="text"
-              placeholder="Yosra Essid"
+              placeholder="Nom et prénom"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
             />

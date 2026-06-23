@@ -204,7 +204,7 @@ function AuthPage() {
             Nom complet
             <input
               type="text"
-              placeholder="Yosra Essid"
+              placeholder="Nom Prénom"
               value={signupName}
               onChange={(e) => setSignupName(e.target.value)}
             />
@@ -214,7 +214,7 @@ function AuthPage() {
             Email
             <input
               type="email"
-              placeholder="yosra@email.com"
+              placeholder="exemple@email.com"
               value={signupEmail}
               onChange={(e) => setSignupEmail(e.target.value)}
             />
