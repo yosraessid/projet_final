@@ -31,7 +31,6 @@ import {
   writeBatch,
   doc,
   deleteDoc,
-  updateDoc,
   serverTimestamp,
 } from 'firebase/firestore'
 import { getFirebaseDb, isFirebaseConfigured } from '../firebase/firebaseClient'
