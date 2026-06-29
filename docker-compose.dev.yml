@@ -1,20 +1,11 @@
 services:
   frontend-dev:
-    # Conteneur dedie au mode developpement.
     container_name: projet_final_frontend_dev
     build:
-      # Utilise le Dockerfile.dev (Vite en mode dev).
       context: .
       dockerfile: Dockerfile.dev
     ports:
-      # L'app sera accessible sur http://localhost:5173
       - "5173:5173"
-    volumes:
-      # Synchronise le code local dans le conteneur.
-      - .:/app
-      # Conserve les node_modules du conteneur.
-      - /app/node_modules
     environment:
-      # Ameliore la detection de changements sur certains systemes.
       CHOKIDAR_USEPOLLING: "true"
     restart: unless-stopped

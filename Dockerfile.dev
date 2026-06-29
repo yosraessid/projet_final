@@ -3,8 +3,10 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Installe les dependances du projet.
+# Copie les fichiers de dependances.
 COPY package*.json ./
+
+# Installe les dependances du projet.
 RUN npm ci
 
 # Copie le code source dans le conteneur.
@@ -13,4 +15,4 @@ COPY . .
 EXPOSE 5173
 
 # Lance Vite en ecoute reseau pour acces depuis le navigateur.
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]
+CMD ["npx", "vite", "--host", "0.0.0.0", "--port", "5173"]
